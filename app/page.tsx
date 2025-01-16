@@ -20,8 +20,6 @@ export default function HomePage() {
         const initializeUser = async () => {
             let user = await getCurrentUser()
 
-            console.log('user', user)
-
             if (!user) {
                await signInAnonymously()
             }

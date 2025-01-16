@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import {useEffect, useState} from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
@@ -8,12 +8,27 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createRoom, joinRoom } from './actions'
+import {getCurrentUser, signInAnonymously} from "@/lib/auth";
 
 export default function HomePage() {
     const [playerName, setPlayerName] = useState('')
     const [roomId, setRoomId] = useState('')
     const [error, setError] = useState('')
     const router = useRouter()
+
+    useEffect(() => {
+        const initializeUser = async () => {
+            let user = await getCurrentUser()
+
+            console.log('user', user)
+
+            if (!user) {
+               await signInAnonymously()
+            }
+        }
+
+        initializeUser()
+    }, [])
 
     const handleCreateRoom = async () => {
         if (!playerName) {

@@ -9,6 +9,8 @@ export async function signInAnonymously() {
         throw error
     }
 
+    console.log('Signed in anonymously:', data.user)
+
     return data.user
 }
 

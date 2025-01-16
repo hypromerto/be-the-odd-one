@@ -21,6 +21,9 @@ export default function GameHome() {
   useEffect(() => {
     const initializeUser = async () => {
       let user = await getCurrentUser()
+
+      console.log('user', user)
+
       if (!user) {
         user = await signInAnonymously()
       }

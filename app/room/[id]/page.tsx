@@ -77,14 +77,12 @@ export default function RoomPage() {
             return { ...prevState, players: updatedPlayers }
           })
         })
-        .on('broadcast', { event: 'game_started' }, payload => {
+        .on('broadcast', { event: 'game_started' }, () => {
           setRoomState(prevState => {
             if (!prevState) return null
             return {
               ...prevState,
-              gameState: 'theme_input',
-              isTwoPlayerMode: payload.payload.isTwoPlayerMode,
-              cooperativeScore: payload.payload.isTwoPlayerMode ? 0 : undefined
+              gameState: 'theme_input'
             }
           })
         })
@@ -96,14 +94,7 @@ export default function RoomPage() {
           })
           fetchRoomData()
         })
-        .on('broadcast', { event: 'answer_submitted' }, payload => {
-          setRoomState(prevState => {
-            if (!prevState) return null
-            return {
-              ...prevState,
-              cooperativeScore: payload.payload.isTwoPlayerMode ? payload.payload.cooperativeScore : prevState.cooperativeScore
-            }
-          })
+        .on('broadcast', { event: 'answer_submitted' }, () => {
           fetchRoomData()
         })
         .on('broadcast', { event: 'all_answers_submitted' }, () => {
@@ -130,9 +121,7 @@ export default function RoomPage() {
             return {
               ...prevState,
               gameState: 'game_over',
-              players: payload.payload.players,
-              isTwoPlayerMode: payload.payload.isTwoPlayerMode,
-              cooperativeScore: payload.payload.cooperativeScore
+              players: payload.payload.players
             }
           })
         })
@@ -143,9 +132,7 @@ export default function RoomPage() {
               ...prevState,
               gameState: 'waiting',
               currentRound: 0,
-              themes: [],
-              isTwoPlayerMode: false,
-              cooperativeScore: 0
+              themes: []
             }
           })
           fetchRoomData()
@@ -242,11 +229,6 @@ export default function RoomPage() {
                 </p>
               </div>
           )}
-          {roomState.isTwoPlayerMode && roomState.gameState !== 'waiting' && (
-              <CardDescription className="text-lg sm:text-xl text-center bg-green-200 py-2 px-4 rounded-full inline-block mx-auto">
-                Cooperative Mode: <span className="font-bold text-green-700">Score {roomState.cooperativeScore}</span>
-              </CardDescription>
-          )}
         </CardHeader>
         <CardContent className="space-y-6">
           <AnimatePresence mode="wait">
@@ -286,20 +268,24 @@ export default function RoomPage() {
                         <PlayerCard key={index} name={player.name} avatar={player.avatar} isHost={player.isHost} ready={player.ready} />
                     ))}
                   </div>
-                  {roomState.players.length === 2 && (
+                  {roomState.players.length < 3 && (
                       <motion.div
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ duration: 0.3 }}
-                          className="mt-4 p-4 bg-blue-100 rounded-lg"
+                          className="mt-4 p-4 bg-yellow-100 rounded-lg"
                       >
-                        <p className="text-blue-800 text-sm sm:text-base">
-                          With 2 players, the game will start in cooperative mode. Work together to give unique answers and earn points as a team!
+                        <p className="text-yellow-800 text-sm sm:text-base">
+                          Waiting for more players... The game requires at least 3 players to start.
                         </p>
                       </motion.div>
                   )}
                   {isHost && (
-                      <Button onClick={handleStartGame} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200">
+                      <Button
+                          onClick={handleStartGame}
+                          disabled={roomState.players.length < 3}
+                          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
                         Start Game
                       </Button>
                   )}
@@ -319,7 +305,6 @@ export default function RoomPage() {
                       <AnswerInput
                           roomId={id as string}
                           theme={roomState.themes[roomState.currentRound].question}
-                          isTwoPlayerMode={roomState.isTwoPlayerMode}
                       />
                   )}
                   {roomState.gameState === 'review' && roomState.themes[roomState.currentRound] && (
@@ -327,7 +312,6 @@ export default function RoomPage() {
                           roomId={id as string}
                           theme={roomState.themes[roomState.currentRound]}
                           isHost={isHost}
-                          isTwoPlayerMode={roomState.isTwoPlayerMode}
                       />
                   )}
                   {roomState.gameState === 'game_over' && (
@@ -336,8 +320,6 @@ export default function RoomPage() {
                           themes={roomState.themes}
                           roomId={id as string}
                           isHost={isHost}
-                          isTwoPlayerMode={roomState.isTwoPlayerMode}
-                          cooperativeScore={roomState.cooperativeScore}
                       />
                   )}
                 </motion.div>

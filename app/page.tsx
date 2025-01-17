@@ -1,6 +1,6 @@
 'use client'
 
-import {useEffect, useState} from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Button } from "@/components/ui/button"
@@ -8,25 +8,12 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createRoom, joinRoom } from './actions'
-import {getCurrentUser, signInAnonymously} from "@/lib/auth";
 
 export default function HomePage() {
     const [playerName, setPlayerName] = useState('')
     const [roomId, setRoomId] = useState('')
     const [error, setError] = useState('')
     const router = useRouter()
-
-    useEffect(() => {
-        const initializeUser = async () => {
-            let user = await getCurrentUser()
-
-            if (!user) {
-               await signInAnonymously()
-            }
-        }
-
-        initializeUser()
-    }, [])
 
     const handleCreateRoom = async () => {
         if (!playerName) {
@@ -81,14 +68,9 @@ export default function HomePage() {
                                     <ol className="list-decimal list-inside text-sm text-gray-700 space-y-1">
                                         <li>Players take turns submitting themes.</li>
                                         <li>Everyone races to come up with unique answers for each theme.</li>
-                                        <li>Earn points by being the odd one out - duplicate answers don't count!</li>
-                                        <li>Enjoy the creative and sometimes hilarious responses.</li>
-                                        <li>In two-player mode, work together to be consistently unique.</li>
+                                        <li>Earn points by being the odd one out!</li>
                                     </ol>
                                 </div>
-                                <p className="text-sm text-gray-600">
-                                    Whether you're competing to stand out or collaborating to be uniquely in sync, Be the Odd One offers a thrilling word adventure!
-                                </p>
                             </div>
 
                             <Tabs defaultValue="create" className="w-full">

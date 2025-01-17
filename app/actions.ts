@@ -5,7 +5,7 @@ import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { RoomState, Player, Theme } from '@/lib/types'
 
-const AVATAR_KEYWORDS = ['cat', 'dog', 'rabbit', 'fox', 'koala', 'panda', 'lion']
+const AVATAR_KEYWORDS = ['cat', 'dog', 'rabbit', 'fox', 'owl', 'penguin', 'koala', 'panda', 'tiger', 'lion']
 
 export async function createRoom(playerName: string) {
   const supabase = createServerActionClient({ cookies })
@@ -20,9 +20,7 @@ export async function createRoom(playerName: string) {
     players: [{ id: user.id, name: playerName, avatar: avatarKeyword, isHost: true, ready: false }],
     gameState: 'waiting',
     currentRound: 0,
-    themes: [],
-    isTwoPlayerMode: false,
-    cooperativeScore: 0
+    themes: []
   }
 
   const { data, error } = await supabase
@@ -99,14 +97,14 @@ export async function startGame(roomId: string) {
     throw new Error('Failed to start game')
   }
 
-  const isTwoPlayerMode = room.players.length === 2
+  if (room.players.length < 3) {
+    throw new Error('Not enough players to start the game')
+  }
 
   const { error } = await supabase
       .from('rooms')
       .update({
-        gameState: 'theme_input',
-        isTwoPlayerMode: isTwoPlayerMode,
-        cooperativeScore: 0
+        gameState: 'theme_input'
       })
       .eq('roomId', roomId)
 
@@ -118,7 +116,7 @@ export async function startGame(roomId: string) {
   await supabase.channel(roomId).send({
     type: 'broadcast',
     event: 'game_started',
-    payload: { isTwoPlayerMode }
+    payload: {}
   })
 }
 
@@ -181,7 +179,7 @@ export async function submitAnswer(roomId: string, answer: string) {
 
   const { data: room, error: fetchError } = await supabase
       .from('rooms')
-      .select('themes, players, currentRound, isTwoPlayerMode, cooperativeScore')
+      .select('themes, players, currentRound')
       .eq('roomId', roomId)
       .single()
 
@@ -200,22 +198,11 @@ export async function submitAnswer(roomId: string, answer: string) {
           : theme
   )
 
-  let updatedCooperativeScore = room.cooperativeScore
-
-  if (room.isTwoPlayerMode) {
-    const allAnswersUnique = currentTheme.answers.every((a: any) =>
-        a.answer.toLowerCase() !== answer.toLowerCase()
-    )
-    if (allAnswersUnique && currentTheme.answers.length === 1) {
-      updatedCooperativeScore += 1
-    }
-  }
 
   const { error: updateError } = await supabase
       .from('rooms')
       .update({
-        themes: updatedThemes,
-        cooperativeScore: updatedCooperativeScore
+        themes: updatedThemes
       })
       .eq('roomId', roomId)
 
@@ -227,7 +214,7 @@ export async function submitAnswer(roomId: string, answer: string) {
   await supabase.channel(roomId).send({
     type: 'broadcast',
     event: 'answer_submitted',
-    payload: { playerName: currentPlayer.name, isTwoPlayerMode: room.isTwoPlayerMode, cooperativeScore: updatedCooperativeScore }
+    payload: { playerName: currentPlayer.name }
   })
 
   // Check if all players have answered
@@ -293,7 +280,7 @@ export async function calculateFinalScores(roomId: string) {
   const supabase = createServerActionClient({ cookies })
   const { data: room, error: fetchError } = await supabase
       .from('rooms')
-      .select('themes, players, isTwoPlayerMode, cooperativeScore')
+      .select('themes, players')
       .eq('roomId', roomId)
       .single()
 
@@ -302,51 +289,38 @@ export async function calculateFinalScores(roomId: string) {
     throw new Error('Failed to calculate final scores')
   }
 
-  if (room.isTwoPlayerMode) {
-    // For two-player mode, we've already been updating the cooperative score
-    const { error: updateError } = await supabase
-        .from('rooms')
-        .update({ gameState: 'game_over' })
-        .eq('roomId', roomId)
+  const playerScores = room.players.reduce((scores: {[key: string]: number}, player: Player) => {
+    scores[player.id] = 0
+    return scores
+  }, {})
 
-    if (updateError) {
-      console.error('Error updating room:', updateError)
-      throw new Error('Failed to update final scores')
-    }
-  } else {
-    const playerScores = room.players.reduce((scores: {[key: string]: number}, player: Player) => {
-      scores[player.id] = 0
-      return scores
-    }, {})
-
-    room.themes.forEach((theme: Theme) => {
-      theme.answers.forEach(answer => {
-        if (!theme.answers.some(a => a.playerId !== answer.playerId && a.answer.toLowerCase() === answer.answer.toLowerCase()) && !answer.invalid) {
-          playerScores[answer.playerId]++
-        }
-      })
+  room.themes.forEach((theme: Theme) => {
+    theme.answers.forEach(answer => {
+      if (!theme.answers.some(a => a.playerId !== answer.playerId && a.answer.toLowerCase() === answer.answer.toLowerCase()) && !answer.invalid) {
+        playerScores[answer.playerId]++
+      }
     })
+  })
 
-    const updatedPlayers = room.players.map((player: Player) => ({
-      ...player,
-      score: playerScores[player.id]
-    }))
+  const updatedPlayers = room.players.map((player: Player) => ({
+    ...player,
+    score: playerScores[player.id]
+  }))
 
-    const { error: updateError } = await supabase
-        .from('rooms')
-        .update({ players: updatedPlayers, gameState: 'game_over' })
-        .eq('roomId', roomId)
+  const { error: updateError } = await supabase
+      .from('rooms')
+      .update({ players: updatedPlayers, gameState: 'game_over' })
+      .eq('roomId', roomId)
 
-    if (updateError) {
-      console.error('Error updating room:', updateError)
-      throw new Error('Failed to update final scores')
-    }
+  if (updateError) {
+    console.error('Error updating room:', updateError)
+    throw new Error('Failed to update final scores')
   }
 
   await supabase.channel(roomId).send({
     type: 'broadcast',
     event: 'game_over',
-    payload: { players: room.players, isTwoPlayerMode: room.isTwoPlayerMode, cooperativeScore: room.cooperativeScore }
+    payload: { players: updatedPlayers }
   })
 }
 
@@ -410,9 +384,7 @@ export async function resetGame(roomId: string) {
         gameState: 'waiting',
         currentRound: 0,
         themes: [],
-        players: room.players.map((player: Player) => ({ ...player, ready: false, score: 0 })),
-        isTwoPlayerMode: false,
-        cooperativeScore: 0
+        players: room.players.map((player: Player) => ({ ...player, ready: false, score: 0 }))
       })
       .eq('roomId', roomId)
 

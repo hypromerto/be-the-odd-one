@@ -22,10 +22,9 @@ interface AnswerReviewScreenProps {
         }>
     }
     isHost: boolean
-    isTwoPlayerMode: boolean
 }
 
-export default function AnswerReviewScreen({ roomId, theme, isHost, isTwoPlayerMode }: AnswerReviewScreenProps) {
+export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerReviewScreenProps) {
     const [invalidAnswers, setInvalidAnswers] = useState<string[]>([])
     const [currentUser, setCurrentUser] = useState<any>(null)
     const supabase = createClientComponentClient()
@@ -104,7 +103,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost, isTwoPlayerM
                     <CardDescription className="text-sm sm:text-base">Theme by: <span className="font-bold text-indigo-600">{theme.author}</span></CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {isHost && !isTwoPlayerMode && (
+                    {isHost && (
                         <Alert className="bg-amber-100 border-amber-200">
                             <Info className="h-4 w-4 text-amber-500" />
                             <AlertTitle className="text-amber-700">Host Instructions</AlertTitle>
@@ -113,16 +112,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost, isTwoPlayerM
                             </AlertDescription>
                         </Alert>
                     )}
-                    {isTwoPlayerMode && (
-                        <Alert className="bg-green-100 border-green-200">
-                            <Info className="h-4 w-4 text-green-500" />
-                            <AlertTitle className="text-green-700">Cooperative Mode</AlertTitle>
-                            <AlertDescription className="text-green-600 text-sm">
-                                In cooperative mode, you earn a point for each unique answer.
-                            </AlertDescription>
-                        </Alert>
-                    )}
-                    {!isTwoPlayerMode && playersWithoutPoints.length > 0 && (
+                    {!playersWithoutPoints.length > 0 && (
                         <Alert className="bg-indigo-100 border-indigo-200">
                             <Users className="h-4 w-4 text-indigo-500" />
                             <AlertTitle className="text-indigo-700">Players not earning points this round:</AlertTitle>
@@ -155,7 +145,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost, isTwoPlayerM
                                             <CardContent className="p-4">
                                                 <p className="font-bold text-base text-indigo-700 mb-2">{answer.playerName}</p>
                                                 <p className="text-gray-700 mb-3 text-sm">{answer.answer}</p>
-                                                {isHost && !isTwoPlayerMode && !isInvalid && !isDuplicate && (
+                                                {isHost && !isInvalid && !isDuplicate && (
                                                     <Button
                                                         onClick={() => handleMarkInvalid(answer.playerId)}
                                                         className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-2 rounded-lg transform hover:scale-105 transition-transform duration-200 text-sm"
@@ -168,9 +158,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost, isTwoPlayerM
                                                         <Lightbulb className="h-4 w-4 text-yellow-500" />
                                                         <AlertTitle className="text-yellow-700 text-sm">Great minds think alike!</AlertTitle>
                                                         <AlertDescription className="text-yellow-600 text-xs">
-                                                            {isTwoPlayerMode
-                                                                ? "This answer matches with your teammate's. No points awarded, but great teamwork!"
-                                                                : "This answer matches with another player's. No points awarded, but it's fun to see the synchronicity!"}
+                                                            This answer matches with another player's. No points awarded, but it's fun to see the synchronicity!
                                                         </AlertDescription>
                                                     </Alert>
                                                 )}

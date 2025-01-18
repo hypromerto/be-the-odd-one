@@ -166,7 +166,7 @@ export default function RoomContent({ initialRoomState, roomId, currentUserId }:
                                     disabled={isStartingGame} // Update 3: Added disabled prop to button
                                     className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200"
                                 >
-                                    {isStartingGame ? 'Starting Game...' : 'Start Game'} // Update 3: Conditional rendering of button text
+                                    {isStartingGame ? 'Starting Game...' : 'Start Game'}
                                 </Button>
                             )}
                             {isHost && roomState.players.length < 3 && (

@@ -46,9 +46,6 @@ export default function RoomContent({ initialRoomState, roomId, currentUserId }:
             .on('broadcast', { event: 'game_started' }, () => {
                 fetchRoomData()
             })
-            .on('broadcast', { event: 'themes_submitted' }, () => {
-                fetchRoomData()
-            })
             .on('broadcast', { event: 'all_players_ready' }, () => {
                 fetchRoomData()
             })

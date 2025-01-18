@@ -24,5 +24,6 @@ export interface RoomState {
     gameState: 'waiting' | 'theme_input' | 'answer_input' | 'review' | 'game_over';
     currentRound: number;
     themes: Theme[];
+    version: number;
 }
 

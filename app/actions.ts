@@ -1,15 +1,20 @@
 'use server'
 
 import { nanoid } from 'nanoid'
-import { createServerActionClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/utils/supabase/server'
 import { RoomState, Player, Theme } from '@/lib/types'
+import { getCurrentUser, signInAnonymously } from "@/lib/auth";
 
-const AVATAR_KEYWORDS = ['cat', 'dog', 'rabbit', 'fox', 'owl', 'penguin', 'koala', 'panda', 'tiger', 'lion']
+const AVATAR_KEYWORDS = ['cat', 'dog', 'rabbit', 'fox', 'koala', 'panda', 'lion']
 
 export async function createRoom(playerName: string) {
-  const supabase = createServerActionClient({ cookies })
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient()
+
+  let user = await getCurrentUser()
+  if (!user) {
+    user = await signInAnonymously()
+  }
+
   if (!user) throw new Error('User not authenticated')
 
   const roomId = nanoid(10)
@@ -39,8 +44,13 @@ export async function createRoom(playerName: string) {
 }
 
 export async function joinRoom(roomId: string, playerName: string) {
-  const supabase = createServerActionClient({ cookies })
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient()
+
+  let user = await getCurrentUser()
+  if (!user) {
+    user = await signInAnonymously()
+  }
+
   if (!user) throw new Error('User not authenticated')
 
   const avatarKeyword = AVATAR_KEYWORDS[Math.floor(Math.random() * AVATAR_KEYWORDS.length)]
@@ -82,9 +92,7 @@ export async function joinRoom(roomId: string, playerName: string) {
 }
 
 export async function startGame(roomId: string) {
-  const supabase = createServerActionClient({ cookies })
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('User not authenticated')
+  const supabase = await createClient()
 
   const { data: room, error: fetchError } = await supabase
       .from('rooms')
@@ -98,7 +106,7 @@ export async function startGame(roomId: string) {
   }
 
   if (room.players.length < 3) {
-    throw new Error('Not enough players to start the game')
+    throw new Error('At least 3 players are required to start the game')
   }
 
   const { error } = await supabase
@@ -121,8 +129,13 @@ export async function startGame(roomId: string) {
 }
 
 export async function submitThemes(roomId: string, themes: string[]) {
-  const supabase = createServerActionClient({ cookies })
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient()
+
+  let user = await getCurrentUser()
+  if (!user) {
+    user = await signInAnonymously()
+  }
+
   if (!user) throw new Error('User not authenticated')
 
   const { data: room, error: fetchError } = await supabase
@@ -173,8 +186,13 @@ export async function submitThemes(roomId: string, themes: string[]) {
 }
 
 export async function submitAnswer(roomId: string, answer: string) {
-  const supabase = createServerActionClient({ cookies })
-  const { data: { user } } = await supabase.auth.getUser()
+  const supabase = await createClient()
+
+  let user = await getCurrentUser()
+  if (!user) {
+    user = await signInAnonymously()
+  }
+
   if (!user) throw new Error('User not authenticated')
 
   const { data: room, error: fetchError } = await supabase
@@ -197,7 +215,6 @@ export async function submitAnswer(roomId: string, answer: string) {
           ? { ...theme, answers: [...theme.answers, { playerId: user.id, playerName: currentPlayer.name, answer, invalid: false }] }
           : theme
   )
-
 
   const { error: updateError } = await supabase
       .from('rooms')
@@ -230,9 +247,7 @@ export async function submitAnswer(roomId: string, answer: string) {
 }
 
 export async function markAnswerInvalid(roomId: string, answerId: string) {
-  const supabase = createServerActionClient({ cookies })
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('User not authenticated')
+  const supabase = await createClient()
 
   const { data: room, error: fetchError } = await supabase
       .from('rooms')
@@ -277,7 +292,8 @@ export async function markAnswerInvalid(roomId: string, answerId: string) {
 }
 
 export async function calculateFinalScores(roomId: string) {
-  const supabase = createServerActionClient({ cookies })
+  const supabase = await createClient()
+
   const { data: room, error: fetchError } = await supabase
       .from('rooms')
       .select('themes, players')
@@ -325,9 +341,7 @@ export async function calculateFinalScores(roomId: string) {
 }
 
 export async function finishReview(roomId: string) {
-  const supabase = createServerActionClient({ cookies })
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('User not authenticated')
+  const supabase = await createClient()
 
   const { data: room, error: fetchError } = await supabase
       .from('rooms')
@@ -363,9 +377,7 @@ export async function finishReview(roomId: string) {
 }
 
 export async function resetGame(roomId: string) {
-  const supabase = createServerActionClient({ cookies })
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('User not authenticated')
+  const supabase = await createClient()
 
   const { data: room, error: fetchError } = await supabase
       .from('rooms')

@@ -1,74 +1,35 @@
-'use client'
+import {redirect} from 'next/navigation'
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import {createRoom, joinRoom} from './actions'
+import AnimatedContent from '@/components/animated-content'
+import {isRedirectError} from "next/dist/client/components/redirect"
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { createRoom, joinRoom } from './actions'
-
-export default function HomePage() {
-    const [playerName, setPlayerName] = useState('')
-    const [roomId, setRoomId] = useState('')
-    const [error, setError] = useState('')
-    const router = useRouter()
-
-    const handleCreateRoom = async () => {
-        if (!playerName) {
-            setError('Please enter your name')
-            return
-        }
-        setError('')
-        try {
-            const { roomId } = await createRoom(playerName)
-            router.push(`/room/${roomId}`)
-        } catch (error) {
-            console.error('Failed to create room:', error)
-            setError('Failed to create room. Please try again.')
-        }
-    }
-
-    const handleJoinRoom = async () => {
-        if (!playerName || !roomId) {
-            setError('Please enter your name and room ID')
-            return
-        }
-        setError('')
-        try {
-            await joinRoom(roomId, playerName)
-            router.push(`/room/${roomId}`)
-        } catch (error) {
-            console.error('Failed to join room:', error)
-            setError('Failed to join room. Please check the room ID and try again.')
-        }
-    }
-
+export default async function HomePage() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="w-full max-w-md"
-            >
+            <AnimatedContent>
                 <Card className="w-full backdrop-blur-sm bg-white/90 shadow-xl">
                     <CardHeader>
                         <CardTitle className="text-3xl font-bold text-center text-indigo-800">Be the Odd One</CardTitle>
-                        <CardDescription className="text-center text-indigo-600">Stand out with your unique answers!</CardDescription>
+                        <CardDescription className="text-center text-indigo-600">Stand out with your unique
+                            answers!</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-6">
                             <div className="space-y-2">
                                 <p className="text-sm text-gray-600">
-                                    Welcome to Be the Odd One, a game that challenges you to think differently and stand out from the crowd! Here's how to play:
+                                    Welcome to Be the Odd One, a game that challenges you to think differently and stand
+                                    out from the crowd! Here's how to play:
                                 </p>
                                 <div className="bg-amber-100 p-4 rounded-lg">
                                     <ol className="list-decimal list-inside text-sm text-gray-700 space-y-1">
                                         <li>Players take turns submitting themes.</li>
                                         <li>Everyone races to come up with unique answers for each theme.</li>
                                         <li>Earn points by being the odd one out!</li>
+                                        <li>At least 3 players are required to start a game.</li>
                                     </ol>
                                 </div>
                             </div>
@@ -79,44 +40,84 @@ export default function HomePage() {
                                     <TabsTrigger value="join">Join Room</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="create">
-                                    <div className="space-y-4">
+                                    <form action={createRoomAction} className="space-y-4">
                                         <Input
                                             type="text"
+                                            name="playerName"
                                             placeholder="Enter your name"
-                                            value={playerName}
-                                            onChange={(e) => setPlayerName(e.target.value)}
+                                            required
                                         />
-                                        <Button onClick={handleCreateRoom} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
+                                        <Button type="submit"
+                                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
                                             Create Room
                                         </Button>
-                                    </div>
+                                    </form>
                                 </TabsContent>
                                 <TabsContent value="join">
-                                    <div className="space-y-4">
+                                    <form action={joinRoomAction} className="space-y-4">
                                         <Input
                                             type="text"
+                                            name="playerName"
                                             placeholder="Enter your name"
-                                            value={playerName}
-                                            onChange={(e) => setPlayerName(e.target.value)}
+                                            required
                                         />
                                         <Input
                                             type="text"
+                                            name="roomId"
                                             placeholder="Enter room ID"
-                                            value={roomId}
-                                            onChange={(e) => setRoomId(e.target.value)}
+                                            required
                                         />
-                                        <Button onClick={handleJoinRoom} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
+                                        <Button type="submit"
+                                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
                                             Join Room
                                         </Button>
-                                    </div>
+                                    </form>
                                 </TabsContent>
                             </Tabs>
-                            {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                         </div>
                     </CardContent>
                 </Card>
-            </motion.div>
+            </AnimatedContent>
         </div>
     )
+}
+
+async function createRoomAction(formData: FormData) {
+    'use server'
+    const playerName = formData.get('playerName') as string
+    if (!playerName) {
+        return {error: 'Please enter your name'}
+    }
+    try {
+        const {roomId} = await createRoom(playerName)
+        redirect(`/room/${roomId}`)
+    } catch (error) {
+        rethrowIfRedirectError(error)
+        console.error('Failed to create room:', error)
+        return {error: 'Failed to create room. Please try again.'}
+    }
+}
+
+async function joinRoomAction(formData: FormData) {
+    'use server'
+    const playerName = formData.get('playerName') as string
+    const roomId = formData.get('roomId') as string
+    if (!playerName || !roomId) {
+        return {error: 'Please enter your name and room ID'}
+    }
+    try {
+        await joinRoom(roomId, playerName)
+        redirect(`/room/${roomId}`)
+    } catch (error) {
+        rethrowIfRedirectError(error)
+        console.error('Failed to join room:', error)
+        return {error: 'Failed to join room. Please check the room ID and try again.'}
+    }
+}
+
+function rethrowIfRedirectError(error: unknown) {
+    if (isRedirectError(error)) {
+        throw error
+    }
 }
 

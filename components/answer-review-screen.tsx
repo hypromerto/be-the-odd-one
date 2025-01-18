@@ -96,6 +96,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
+            className="w-full max-w-4xl mx-auto"
         >
             <Card className="w-full">
                 <CardHeader>
@@ -112,7 +113,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                             </AlertDescription>
                         </Alert>
                     )}
-                    {!playersWithoutPoints.length > 0 && (
+                    {playersWithoutPoints.length > 0 && (
                         <Alert className="bg-indigo-100 border-indigo-200">
                             <Users className="h-4 w-4 text-indigo-500" />
                             <AlertTitle className="text-indigo-700">Players not earning points this round:</AlertTitle>
@@ -123,67 +124,67 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                     )}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <AnimatePresence>
-                            {theme.answers.map((answer, index) => {
-                                const isDuplicate = duplicateAnswers.includes(answer.playerId)
-                                const isInvalid = invalidAnswers.includes(answer.playerId)
-                                const isUnique = !isDuplicate && !isInvalid
-                                return (
-                                    <motion.div
-                                        key={answer.playerId}
-                                        layout
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.8 }}
-                                        transition={{ duration: 0.3 }}
+                            {theme.answers.map((answer, index) => (
+                                <motion.div
+                                    key={answer.playerId}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.8 }}
+                                    transition={{ duration: 0.3 }}
+                                >
+                                    <Card
+                                        className={`
+                      ${!duplicateAnswers.includes(answer.playerId) && !answer.invalid
+                                            ? 'border-green-500 bg-green-50'
+                                            : answer.invalid
+                                                ? 'border-red-500 bg-red-50'
+                                                : 'border-yellow-500 bg-yellow-50'}
+                      hover:bg-indigo-100 transition-colors duration-200 border-2 flex flex-col
+                    `}
                                     >
-                                        <Card
-                                            className={`
-                        ${isUnique ? 'border-green-500 bg-green-50' : 'border-yellow-500 bg-yellow-50'}
-                        hover:bg-indigo-100 transition-colors duration-200 border-2
-                      `}
-                                        >
-                                            <CardContent className="p-4">
+                                        <CardContent className="p-4 flex flex-col justify-between min-h-[200px]">
+                                            <div>
                                                 <p className="font-bold text-base text-indigo-700 mb-2">{answer.playerName}</p>
                                                 <p className="text-gray-700 mb-3 text-sm">{answer.answer}</p>
-                                                {isHost && !isInvalid && !isDuplicate && (
-                                                    <Button
-                                                        onClick={() => handleMarkInvalid(answer.playerId)}
-                                                        className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-2 rounded-lg transform hover:scale-105 transition-transform duration-200 text-sm"
-                                                    >
-                                                        Mark as Invalid
-                                                    </Button>
-                                                )}
-                                                {isDuplicate && !isInvalid && (
-                                                    <Alert variant="default" className="bg-yellow-100 border-yellow-200">
-                                                        <Lightbulb className="h-4 w-4 text-yellow-500" />
-                                                        <AlertTitle className="text-yellow-700 text-sm">Great minds think alike!</AlertTitle>
-                                                        <AlertDescription className="text-yellow-600 text-xs">
-                                                            This answer matches with another player's. No points awarded, but it's fun to see the synchronicity!
-                                                        </AlertDescription>
-                                                    </Alert>
-                                                )}
-                                                {isInvalid && (
-                                                    <Alert variant="default" className="bg-yellow-100 border-yellow-200">
-                                                        <Lightbulb className="h-4 w-4 text-yellow-500" />
-                                                        <AlertTitle className="text-yellow-700 text-sm">Answer marked as invalid</AlertTitle>
-                                                        <AlertDescription className="text-yellow-600 text-xs">
-                                                            The host has marked this answer as invalid for this round. No points will be awarded for this answer.
-                                                        </AlertDescription>
-                                                    </Alert>
-                                                )}
-                                            </CardContent>
-                                        </Card>
-                                    </motion.div>
-                                )
-                            })}
+                                            </div>
+                                            {(duplicateAnswers.includes(answer.playerId) || answer.invalid) && (
+                                                <Alert variant="default" className={`${duplicateAnswers.includes(answer.playerId) ? 'bg-yellow-100 border-yellow-200' : 'bg-red-100 border-red-200'} p-2 mt-2`}>
+                                                    <div className="flex items-center">
+                                                        <Lightbulb className="h-4 w-4 mr-2 flex-shrink-0" />
+                                                        <div>
+                                                            <AlertTitle className={`${duplicateAnswers.includes(answer.playerId) ? 'text-yellow-700' : 'text-red-700'} text-sm font-semibold`}>
+                                                                {duplicateAnswers.includes(answer.playerId) ? 'Duplicate Answer' : 'Invalid Answer'}
+                                                            </AlertTitle>
+                                                            <AlertDescription className={`${duplicateAnswers.includes(answer.playerId) ? 'text-yellow-600' : 'text-red-600'} text-xs`}>
+                                                                {duplicateAnswers.includes(answer.playerId)
+                                                                    ? "This answer matches with another player's. No points awarded."
+                                                                    : "The host has marked this answer as invalid for this round. No points will be awarded."}
+                                                            </AlertDescription>
+                                                        </div>
+                                                    </div>
+                                                </Alert>
+                                            )}
+                                            {isHost && !answer.invalid && !duplicateAnswers.includes(answer.playerId) && (
+                                                <Button
+                                                    onClick={() => handleMarkInvalid(answer.playerId)}
+                                                    className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-2 rounded-lg transform hover:scale-105 transition-transform duration-200 text-sm mt-2"
+                                                >
+                                                    Mark as Invalid
+                                                </Button>
+                                            )}
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            ))}
                         </AnimatePresence>
                     </div>
                     {isHost && (
-                        <Button onClick={handleFinishReview} className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200">
+                        <Button onClick={handleFinishReview} className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200 mt-6">
                             Finish Review
                         </Button>
                     )}
-                    {!isHost && <p className="text-base sm:text-lg text-indigo-600 font-bold mt-4">Waiting for the host to finish reviewing answers...</p>}
+                    {!isHost && <p className="text-base sm:text-lg text-indigo-600 font-bold mt-6">Waiting for the host to finish reviewing answers...</p>}
                 </CardContent>
             </Card>
         </motion.div>

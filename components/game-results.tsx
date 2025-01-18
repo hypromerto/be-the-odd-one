@@ -89,21 +89,21 @@ export default function GameResults({ players, themes, roomId, isHost }: GameRes
 
             <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sortedPlayers.slice(1).map((player, index) => (
-                    <Card key={player.id} className="bg-white/80 rounded-lg shadow-md p-3 flex items-center space-x-4 transform hover:scale-105 transition-transform duration-300">
-                        <div className="flex-shrink-0">
+                    <Card key={player.id} className="bg-white/80 rounded-lg shadow-md p-4 flex flex-col items-center space-y-2 transform hover:scale-105 transition-transform duration-300">
+                        <div className="flex items-center space-x-4">
                             <Image
                                 src={`/avatars/${player.avatar}.png`}
                                 alt={`${player.name}'s avatar`}
-                                width={40}
-                                height={40}
-                                className="rounded-full"
+                                width={50}
+                                height={50}
+                                className="rounded-full border-2 border-purple-500"
                             />
+                            <div>
+                                <p className="text-lg font-semibold text-purple-700">{player.name}</p>
+                                <p className="text-base text-gray-600">{player.score} points</p>
+                            </div>
                         </div>
-                        <div className="flex-grow">
-                            <p className="text-base sm:text-lg font-semibold text-purple-700">{player.name}</p>
-                            <p className="text-sm sm:text-base text-gray-600">{player.score} points</p>
-                        </div>
-                        <div className="flex-shrink-0 text-xl sm:text-2xl font-bold text-purple-700">
+                        <div className="text-2xl font-bold text-purple-700">
                             #{index + 2}
                         </div>
                     </Card>

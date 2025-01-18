@@ -1,7 +1,7 @@
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/server'
 
 export async function signInAnonymously() {
-    const supabase = createClientComponentClient()
+    const supabase = await createClient()
     const { data, error } = await supabase.auth.signInAnonymously()
 
     if (error) {
@@ -15,7 +15,7 @@ export async function signInAnonymously() {
 }
 
 export async function getCurrentUser() {
-    const supabase = createClientComponentClient()
+    const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     return user
 }

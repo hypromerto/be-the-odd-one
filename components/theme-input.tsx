@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { submitThemes } from '@/app/actions'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { nanoid } from 'nanoid'
 
 interface ThemeInputProps {
     roomId: string
@@ -12,12 +13,13 @@ interface ThemeInputProps {
 
 export default function ThemeInput({ roomId }: ThemeInputProps) {
     const [theme, setTheme] = useState('')
-    const [themes, setThemes] = useState<string[]>([])
+    const [themes, setThemes] = useState<Array<{ theme: string, submissionId: string }>>([])
     const [isReady, setIsReady] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleAddTheme = () => {
         if (theme.trim()) {
-            setThemes(prevThemes => [...prevThemes, theme.trim()])
+            setThemes(prevThemes => [...prevThemes, { theme: theme.trim(), submissionId: nanoid() }])
             setTheme('')
         }
     }
@@ -27,12 +29,15 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
     }
 
     const handleReady = async () => {
-        if (themes.length > 0) {
+        if (themes.length > 0 && !isSubmitting) {
+            setIsSubmitting(true)
             try {
                 await submitThemes(roomId, themes)
                 setIsReady(true)
             } catch (error) {
                 console.error('Failed to submit themes:', error)
+            } finally {
+                setIsSubmitting(false)
             }
         }
     }
@@ -75,15 +80,19 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
                     <h3 className="font-bold mb-2 text-indigo-800">Your Themes:</h3>
                     <ul className="space-y-2">
                         {themes.map((t, index) => (
-                            <li key={index} className="flex items-center justify-between">
-                                <span className="text-indigo-700 text-sm">{t}</span>
+                            <li key={t.submissionId} className="flex items-center justify-between">
+                                <span className="text-indigo-700 text-sm">{t.theme}</span>
                                 <Button variant="ghost" onClick={() => handleRemoveTheme(index)} className="text-red-500 hover:text-red-700 text-sm">Remove</Button>
                             </li>
                         ))}
                     </ul>
                 </div>
-                <Button onClick={handleReady} disabled={themes.length === 0} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed">
-                    Ready
+                <Button
+                    onClick={handleReady}
+                    disabled={themes.length === 0 || isSubmitting}
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {isSubmitting ? 'Submitting...' : 'Ready'}
                 </Button>
             </CardContent>
         </Card>

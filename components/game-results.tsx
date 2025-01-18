@@ -32,6 +32,7 @@ interface GameResultsProps {
 
 export default function GameResults({ players, themes, roomId, isHost }: GameResultsProps) {
     const [showConfetti, setShowConfetti] = useState(false)
+    const [isResettingGame, setIsResettingGame] = useState(false)
 
     useEffect(() => {
         if (showConfetti) {
@@ -47,12 +48,14 @@ export default function GameResults({ players, themes, roomId, isHost }: GameRes
     const winner = sortedPlayers[0]
 
     const handlePlayAgain = async () => {
-        if (isHost) {
-            try {
-                await resetGame(roomId)
-            } catch (error) {
-                console.error('Failed to reset game:', error)
-            }
+        if (isResettingGame) return
+        setIsResettingGame(true)
+        try {
+            await resetGame(roomId)
+        } catch (error) {
+            console.error('Failed to reset game:', error)
+        } finally {
+            setIsResettingGame(false)
         }
     }
 
@@ -130,9 +133,10 @@ export default function GameResults({ players, themes, roomId, isHost }: GameRes
             {isHost && (
                 <Button
                     onClick={handlePlayAgain}
+                    disabled={isResettingGame}
                     className="mt-4 sm:mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-full text-lg sm:text-xl transform hover:scale-105 transition-transform duration-200"
                 >
-                    Play Again
+                    {isResettingGame ? 'Resetting Game...' : 'Play Again'}
                 </Button>
             )}
             {!isHost && (

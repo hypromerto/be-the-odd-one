@@ -7,15 +7,19 @@ export interface Player {
     score?: number;
 }
 
+export interface Answer {
+    playerId: string;
+    playerName: string;
+    answer: string;
+    invalid: boolean;
+    submissionId: string;
+}
+
 export interface Theme {
     question: string;
     author: string;
-    answers: Array<{
-        playerId: string;
-        playerName: string;
-        answer: string;
-        invalid: boolean;
-    }>;
+    answers: Answer[];
+    submissionId: string;
 }
 
 export interface RoomState {

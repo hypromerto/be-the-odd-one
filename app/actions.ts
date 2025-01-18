@@ -2,7 +2,7 @@
 
 import { nanoid } from 'nanoid'
 import { createClient } from '@/utils/supabase/server'
-import { RoomState, Player, Theme } from '@/lib/types'
+import { RoomState, Player, Theme, Answer } from '@/lib/types'
 import { getCurrentUser, signInAnonymously } from "@/lib/auth";
 
 const AVATAR_KEYWORDS = ['cat', 'dog', 'rabbit', 'fox', 'koala', 'panda', 'lion']
@@ -23,17 +23,18 @@ async function updateRoomWithRetry(supabase: any, roomId: string, updateFunction
     const updates = updateFunction(room)
     const newVersion = (room.version || 0) + 1
 
-    const { error: updateError } = await supabase
+    const { data, error: updateError } = await supabase
         .from('rooms')
         .update({ ...updates, version: newVersion })
         .eq('roomId', roomId)
         .eq('version', room.version || 0)
+        .select()
 
-    if (!updateError) {
-      return { success: true, room: { ...room, ...updates, version: newVersion } }
+    if (!updateError && data) {
+      return { success: true, room: data[0] }
     }
 
-    if (updateError.code === '23514') {  // Postgres check constraint violation
+    if (updateError && updateError.code === '23514') {  // Postgres check constraint violation
       console.log('Optimistic lock failed, retrying...')
       continue
     }
@@ -130,7 +131,7 @@ export async function startGame(roomId: string) {
   })
 }
 
-export async function submitThemes(roomId: string, themes: string[]) {
+export async function submitThemes(roomId: string, themes: Array<{ theme: string, submissionId: string }>) {
   const supabase = await createClient()
 
   let user = await getCurrentUser()
@@ -144,7 +145,16 @@ export async function submitThemes(roomId: string, themes: string[]) {
     const currentPlayer = room.players.find((p: Player) => p.id === user.id)
     if (!currentPlayer) throw new Error('Player not found in room')
 
-    const updatedThemes = [...(room.themes || []), ...themes.map(theme => ({ question: theme, author: currentPlayer.name, answers: [] }))]
+    const newThemes = themes.filter(theme =>
+        !room.themes.some(existingTheme => existingTheme.submissionId === theme.submissionId)
+    ).map(theme => ({
+      question: theme.theme,
+      author: currentPlayer.name,
+      answers: [],
+      submissionId: theme.submissionId
+    }))
+
+    const updatedThemes = [...(room.themes || []), ...newThemes]
     const updatedPlayers = room.players.map((player: Player) =>
         player.id === user.id ? { ...player, ready: true } : player
     )
@@ -170,7 +180,7 @@ export async function submitThemes(roomId: string, themes: string[]) {
   }
 }
 
-export async function submitAnswer(roomId: string, answer: string) {
+export async function submitAnswer(roomId: string, answer: string, submissionId: string) {
   const supabase = await createClient()
 
   let user = await getCurrentUser()
@@ -184,9 +194,26 @@ export async function submitAnswer(roomId: string, answer: string) {
     const currentPlayer = room.players.find((p: Player) => p.id === user.id)
     if (!currentPlayer) throw new Error('Player not found in room')
 
+    const currentTheme = room.themes[room.currentRound]
+
+    // Check if this submission already exists
+    const existingSubmission = currentTheme.answers.find((a: Answer) => a.submissionId === submissionId)
+    if (existingSubmission) {
+      // If it exists, don't update anything
+      return {}
+    }
+
+    const newAnswer: Answer = {
+      playerId: user.id,
+      playerName: currentPlayer.name,
+      answer,
+      invalid: false,
+      submissionId
+    }
+
     const updatedThemes = room.themes.map((theme: Theme, index: number) =>
         index === room.currentRound
-            ? { ...theme, answers: [...theme.answers, { playerId: user.id, playerName: currentPlayer.name, answer, invalid: false }] }
+            ? { ...theme, answers: [...theme.answers, newAnswer] }
             : theme
     )
 
@@ -196,13 +223,23 @@ export async function submitAnswer(roomId: string, answer: string) {
     return { themes: updatedThemes, gameState: newGameState }
   })
 
-  if (result.room.gameState === 'review') {
+  if (result.success) {
     await supabase.channel(roomId).send({
       type: 'broadcast',
-      event: 'all_answers_submitted',
-      payload: {}
+      event: 'answer_submitted',
+      payload: { playerName: user.name, submissionId }
     })
+
+    if (result.room.gameState === 'review') {
+      await supabase.channel(roomId).send({
+        type: 'broadcast',
+        event: 'all_answers_submitted',
+        payload: {}
+      })
+    }
   }
+
+  return result
 }
 
 export async function markAnswerInvalid(roomId: string, answerId: string) {

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { submitAnswer } from '@/app/actions'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { nanoid } from 'nanoid'
 
 interface AnswerInputProps {
     roomId: string
@@ -15,16 +16,29 @@ interface AnswerInputProps {
 export default function AnswerInput({ roomId, theme }: AnswerInputProps) {
     const [answer, setAnswer] = useState('')
     const [isSubmitted, setIsSubmitted] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!answer) return
+        if (!answer || isSubmitting) return
+        setIsSubmitting(true)
+        setError(null)
+        const submissionId = nanoid()
+
         try {
-            await submitAnswer(roomId, answer)
-            setAnswer('')
-            setIsSubmitted(true)
+            const result = await submitAnswer(roomId, answer, submissionId)
+            if (result.success) {
+                setAnswer('')
+                setIsSubmitted(true)
+            } else {
+                setError('Failed to submit answer. Please try again.')
+            }
         } catch (error) {
             console.error('Failed to submit answer:', error)
+            setError('Failed to submit answer. Please try again.')
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -54,9 +68,14 @@ export default function AnswerInput({ roomId, theme }: AnswerInputProps) {
                                     placeholder="Enter your answer"
                                     className="w-full border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                 />
-                                <Button type="submit" className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200">
-                                    Submit Answer
+                                <Button
+                                    type="submit"
+                                    className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200"
+                                    disabled={isSubmitting}
+                                >
+                                    {isSubmitting ? 'Submitting...' : 'Submit Answer'}
                                 </Button>
+                                {error && <p className="text-red-500 text-sm">{error}</p>}
                             </form>
                         </CardContent>
                     </Card>

@@ -29,6 +29,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
         theme.answers.filter(answer => answer.invalid).map(answer => answer.playerId)
     )
     const [currentUser, setCurrentUser] = useState<any>(null)
+    const [isFinishingReview, setIsFinishingReview] = useState(false) // Added state for review completion
     const supabase = createClientComponentClient()
 
     useEffect(() => {
@@ -68,10 +69,14 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
     }
 
     const handleFinishReview = async () => {
+        if (isFinishingReview) return
+        setIsFinishingReview(true)
         try {
             await finishReview(roomId)
         } catch (error) {
             console.error('Failed to finish review:', error)
+        } finally {
+            setIsFinishingReview(false)
         }
     }
 
@@ -184,8 +189,12 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                         </AnimatePresence>
                     </div>
                     {isHost && (
-                        <Button onClick={handleFinishReview} className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200 mt-6">
-                            Finish Review
+                        <Button
+                            onClick={handleFinishReview}
+                            disabled={isFinishingReview}
+                            className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200 mt-6"
+                        >
+                            {isFinishingReview ? 'Finishing Review...' : 'Finish Review'}
                         </Button>
                     )}
                     {!isHost && <p className="text-base sm:text-lg text-indigo-600 font-bold mt-6">Waiting for the host to finish reviewing answers...</p>}

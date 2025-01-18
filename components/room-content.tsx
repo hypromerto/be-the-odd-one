@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/utils/supabase/client'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { PlayerCard } from '@/components/player-card'
 import { Button } from "@/components/ui/button"
 import { startGame } from '@/app/actions'
@@ -22,7 +22,8 @@ interface RoomContentProps {
 export default function RoomContent({ initialRoomState, roomId, currentUserId }: RoomContentProps) {
     const [roomState, setRoomState] = useState<RoomState>(initialRoomState)
     const [isCopied, setIsCopied] = useState(false)
-    const supabase = createClient()
+    const [isStartingGame, setIsStartingGame] = useState(false) // Update 1: Added isStartingGame state
+    const supabase = createClientComponentClient()
 
     useEffect(() => {
         const channel = supabase.channel(roomId)
@@ -85,11 +86,15 @@ export default function RoomContent({ initialRoomState, roomId, currentUserId }:
         }
     }
 
-    const handleStartGame = async () => {
+    const handleStartGame = async () => { // Update 2: Updated handleStartGame function
+        if (isStartingGame) return
+        setIsStartingGame(true)
         try {
             await startGame(roomId)
         } catch (error) {
             console.error('Failed to start game:', error)
+        } finally {
+            setIsStartingGame(false)
         }
     }
 
@@ -104,6 +109,8 @@ export default function RoomContent({ initialRoomState, roomId, currentUserId }:
     }
 
     const isHost = roomState.players.some(player => player.id === currentUserId && player.isHost)
+    const currentTheme = roomState.themes[roomState.currentRound]
+    const hasAnswered = currentTheme?.answers.some(answer => answer.playerId === currentUserId)
 
     return (
         <Card className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg w-full mx-auto">
@@ -154,8 +161,12 @@ export default function RoomContent({ initialRoomState, roomId, currentUserId }:
                                 </div>
                             )}
                             {isHost && roomState.players.length >= 3 && (
-                                <Button onClick={handleStartGame} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200">
-                                    Start Game
+                                <Button
+                                    onClick={handleStartGame}
+                                    disabled={isStartingGame} // Update 3: Added disabled prop to button
+                                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200"
+                                >
+                                    {isStartingGame ? 'Starting Game...' : 'Start Game'} // Update 3: Conditional rendering of button text
                                 </Button>
                             )}
                             {isHost && roomState.players.length < 3 && (
@@ -169,16 +180,27 @@ export default function RoomContent({ initialRoomState, roomId, currentUserId }:
                             {roomState.gameState === 'theme_input' && (
                                 <ThemeInput roomId={roomId} />
                             )}
-                            {roomState.gameState === 'answer_input' && roomState.themes[roomState.currentRound] && (
+                            {roomState.gameState === 'answer_input' && currentTheme && !hasAnswered && (
                                 <AnswerInput
                                     roomId={roomId}
-                                    theme={roomState.themes[roomState.currentRound].question}
+                                    theme={currentTheme.question}
                                 />
                             )}
-                            {roomState.gameState === 'review' && roomState.themes[roomState.currentRound] && (
+                            {roomState.gameState === 'answer_input' && currentTheme && hasAnswered && (
+                                <Card className="w-full">
+                                    <CardContent className="flex flex-col items-center space-y-4 p-6">
+                                        <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">Waiting for other players</CardTitle>
+                                        <CardDescription className="text-center">
+                                            You've submitted your answer. Please wait for other players to submit their answers.
+                                        </CardDescription>
+                                        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+                                    </CardContent>
+                                </Card>
+                            )}
+                            {roomState.gameState === 'review' && currentTheme && (
                                 <AnswerReviewScreen
                                     roomId={roomId}
-                                    theme={roomState.themes[roomState.currentRound]}
+                                    theme={currentTheme}
                                     isHost={isHost}
                                 />
                             )}

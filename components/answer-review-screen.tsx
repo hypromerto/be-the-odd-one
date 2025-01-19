@@ -8,6 +8,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Info, Lightbulb, Users } from 'lucide-react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface AnswerReviewScreenProps {
     roomId: string
@@ -29,7 +30,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
         theme.answers.filter(answer => answer.invalid).map(answer => answer.playerId)
     )
     const [currentUser, setCurrentUser] = useState<any>(null)
-    const [isFinishingReview, setIsFinishingReview] = useState(false) // Added state for review completion
+    const [isFinishingReview, setIsFinishingReview] = useState(false)
     const supabase = createClientComponentClient()
 
     useEffect(() => {
@@ -129,7 +130,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                             </AlertDescription>
                         </Alert>
                     )}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <AnimatePresence>
                             {theme.answers.map((answer, index) => {
                                 const isDuplicate = duplicateAnswers.includes(answer.playerId)
@@ -148,39 +149,47 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                                             className={`
                         ${isUnique ? 'border-green-500 bg-green-50' : 'border-yellow-500 bg-yellow-50'}
                         ${isInvalid ? 'border-red-500 bg-red-50' : ''}
-                        hover:bg-indigo-100 transition-colors duration-200 border-2 flex flex-col
+                        hover:bg-indigo-100 transition-colors duration-200 border-2 flex flex-col w-full h-[200px]
                       `}
                                         >
-                                            <CardContent className="p-4 flex flex-col justify-between min-h-[200px]">
+                                            <CardContent className="p-5 flex flex-col justify-between h-full">
                                                 <div>
-                                                    <p className="font-bold text-base text-indigo-700 mb-2">{answer.playerName}</p>
-                                                    <p className="text-gray-700 mb-3 text-sm">{answer.answer}</p>
+                                                    <p className="font-bold text-base text-indigo-700">{answer.playerName}</p>
+                                                    <p className="text-gray-700 text-sm mt-1 line-clamp-2">{answer.answer}</p>
                                                 </div>
-                                                {(isDuplicate || isInvalid) && (
-                                                    <Alert variant="default" className={`${isDuplicate ? 'bg-yellow-100 border-yellow-200' : 'bg-red-100 border-red-200'} p-2 mt-2`}>
-                                                        <div className="flex items-center">
-                                                            <Lightbulb className="h-4 w-4 mr-2 flex-shrink-0" />
-                                                            <div>
-                                                                <AlertTitle className={`${isDuplicate ? 'text-yellow-700' : 'text-red-700'} text-sm font-semibold`}>
-                                                                    {isDuplicate ? 'Duplicate Answer' : 'Invalid Answer'}
-                                                                </AlertTitle>
-                                                                <AlertDescription className={`${isDuplicate ? 'text-yellow-600' : 'text-red-600'} text-xs`}>
-                                                                    {isDuplicate
-                                                                        ? "This answer matches with another player's. No points awarded."
-                                                                        : "The host has marked this answer as invalid for this round. No points will be awarded."}
-                                                                </AlertDescription>
-                                                            </div>
-                                                        </div>
-                                                    </Alert>
-                                                )}
-                                                {isHost && !isInvalid && !isDuplicate && (
-                                                    <Button
-                                                        onClick={() => handleMarkInvalid(answer.playerId)}
-                                                        className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-1 px-2 rounded-lg transform hover:scale-105 transition-transform duration-200 text-sm mt-2"
-                                                    >
-                                                        Mark as Invalid
-                                                    </Button>
-                                                )}
+                                                <div className="mt-2">
+                                                    {(isDuplicate || isInvalid) && (
+                                                        <TooltipProvider>
+                                                            <Tooltip>
+                                                                <TooltipTrigger asChild>
+                                                                    <Alert variant="default" className={`${isDuplicate ? 'bg-yellow-100 border-yellow-200' : 'bg-red-100 border-red-200'} p-2`}>
+                                                                        <div className="flex items-center w-full">
+                                                                            <Lightbulb className="h-4 w-4 flex-shrink-0 mr-2" />
+                                                                            <AlertTitle className={`${isDuplicate ? 'text-yellow-700' : 'text-red-700'} text-sm font-semibold flex-grow`}>
+                                                                                {isDuplicate ? 'Duplicate Answer' : 'Invalid Answer'}
+                                                                            </AlertTitle>
+                                                                        </div>
+                                                                    </Alert>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent side="top">
+                                                                    <p className="text-xs max-w-xs">
+                                                                        {isDuplicate
+                                                                            ? "This answer matches with another player's. No points awarded."
+                                                                            : "The host has marked this answer as invalid for this round. No points will be awarded."}
+                                                                    </p>
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
+                                                    )}
+                                                    {isHost && !isInvalid && !isDuplicate && (
+                                                        <Button
+                                                            onClick={() => handleMarkInvalid(answer.playerId)}
+                                                            className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg transform hover:scale-105 transition-transform duration-200 text-sm"
+                                                        >
+                                                            Mark as Invalid
+                                                        </Button>
+                                                    )}
+                                                </div>
                                             </CardContent>
                                         </Card>
                                     </motion.div>

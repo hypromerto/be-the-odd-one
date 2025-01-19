@@ -22,8 +22,8 @@ export function PlayerCard({ name, avatar, isHost, ready }: PlayerCardProps) {
                     <span className="absolute -top-1 -right-1 bg-yellow-400 text-xs font-bold px-1 py-0.5 rounded-full">Host</span>
                 )}
             </div>
-            <div className="flex-grow">
-                <h3 className="text-sm font-bold text-purple-700">{name}</h3>
+            <div className="flex-grow min-w-0">
+                <h3 className="text-sm font-bold text-purple-700 truncate">{name}</h3>
                 {ready && (
                     <span className="text-xs text-green-500 font-semibold">Ready!</span>
                 )}

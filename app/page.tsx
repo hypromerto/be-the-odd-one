@@ -26,7 +26,33 @@ export default function HomePage() {
     const [isCreating, setIsCreating] = useState(false)
     const [isJoining, setIsJoining] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [recaptchaLoaded, setRecaptchaLoaded] = useState(false)
     const router = useRouter()
+
+    useEffect(() => {
+        // Initialize reCAPTCHA when the component mounts
+        const script = document.createElement("script")
+        script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.RECAPTCHA_SITE_KEY}`
+        script.async = true
+        script.defer = true
+        script.onload = () => {
+            window.grecaptcha.ready(() => {
+                setRecaptchaLoaded(true)
+            })
+        }
+        document.body.appendChild(script)
+
+        return () => {
+            document.body.removeChild(script)
+        }
+    }, [])
+
+    const executeRecaptcha = async () => {
+        if (!window.grecaptcha) {
+            throw new Error("reCAPTCHA not loaded")
+        }
+        return window.grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!, { action: "create_room" })
+    }
 
     const handleCreateRoom = async (formData: FormData) => {
         const playerName = formData.get("playerName") as string
@@ -37,24 +63,10 @@ export default function HomePage() {
         setIsCreating(true)
         setError(null)
         try {
-            // Execute reCAPTCHA v3
-            const token = await new Promise<string>((resolve, reject) => {
-                if (window.grecaptcha) {
-                    window.grecaptcha.ready(async () => {
-                        try {
-                            const token = await window.grecaptcha.execute(process.env.RECAPTCHA_SITE_KEY!, {
-                                action: "create_room",
-                            })
-                            resolve(token)
-                        } catch (error) {
-                            reject(error)
-                        }
-                    })
-                } else {
-                    reject("reCAPTCHA not loaded")
-                }
-            })
-
+            if (!recaptchaLoaded) {
+                throw new Error("reCAPTCHA not loaded yet")
+            }
+            const token = await executeRecaptcha()
             const { roomId } = await createRoom(playerName, token)
             router.push(`/room/${roomId}`)
         } catch (error) {
@@ -86,75 +98,69 @@ export default function HomePage() {
     }
 
     return (
-        <>
-            <Script
-                src={`https://www.google.com/recaptcha/api.js?render=${process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY}`}
-                strategy="lazyOnload"
-            />
-            <div className="min-h-screen flex flex-col items-center justify-center p-4">
-                <AnimatedContent>
-                    <Card className="w-full backdrop-blur-sm bg-white/90 shadow-xl">
-                        <CardHeader>
-                            <CardTitle className="text-3xl font-bold text-center text-indigo-800">Be the Odd One</CardTitle>
-                            <CardDescription className="text-center text-indigo-600">
-                                Stand out with your unique answers!
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <p className="text-sm text-gray-600">
-                                        Welcome to Be the Odd One, a game that challenges you to think differently and stand out from the
-                                        crowd! Here's how to play:
-                                    </p>
-                                    <div className="bg-amber-100 p-4 rounded-lg">
-                                        <ol className="list-decimal list-inside text-sm text-gray-700 space-y-1">
-                                            <li>Players take turns submitting themes.</li>
-                                            <li>Everyone races to come up with unique answers for each theme.</li>
-                                            <li>Earn points by being the odd one out!</li>
-                                            <li>At least 3 players are required to start a game.</li>
-                                        </ol>
-                                    </div>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <AnimatedContent>
+                <Card className="w-full backdrop-blur-sm bg-white/90 shadow-xl">
+                    <CardHeader>
+                        <CardTitle className="text-3xl font-bold text-center text-indigo-800">Be the Odd One</CardTitle>
+                        <CardDescription className="text-center text-indigo-600">
+                            Stand out with your unique answers!
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <p className="text-sm text-gray-600">
+                                    Welcome to Be the Odd One, a game that challenges you to think differently and stand out from the
+                                    crowd! Here's how to play:
+                                </p>
+                                <div className="bg-amber-100 p-4 rounded-lg">
+                                    <ol className="list-decimal list-inside text-sm text-gray-700 space-y-1">
+                                        <li>Players take turns submitting themes.</li>
+                                        <li>Everyone races to come up with unique answers for each theme.</li>
+                                        <li>Earn points by being the odd one out!</li>
+                                        <li>At least 3 players are required to start a game.</li>
+                                    </ol>
                                 </div>
-
-                                <Tabs defaultValue="create" className="w-full">
-                                    <TabsList className="grid w-full grid-cols-2">
-                                        <TabsTrigger value="create">Create Room</TabsTrigger>
-                                        <TabsTrigger value="join">Join Room</TabsTrigger>
-                                    </TabsList>
-                                    <TabsContent value="create">
-                                        <form action={handleCreateRoom} className="space-y-4">
-                                            <Input type="text" name="playerName" placeholder="Enter your name" required />
-                                            <Button
-                                                type="submit"
-                                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
-                                                disabled={isCreating}
-                                            >
-                                                {isCreating ? "Creating..." : "Create Room"}
-                                            </Button>
-                                        </form>
-                                    </TabsContent>
-                                    <TabsContent value="join">
-                                        <form action={handleJoinRoom} className="space-y-4">
-                                            <Input type="text" name="playerName" placeholder="Enter your name" required />
-                                            <Input type="text" name="roomId" placeholder="Enter room ID" required />
-                                            <Button
-                                                type="submit"
-                                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
-                                                disabled={isJoining}
-                                            >
-                                                {isJoining ? "Joining..." : "Join Room"}
-                                            </Button>
-                                        </form>
-                                    </TabsContent>
-                                </Tabs>
-                                {error && <p className="text-red-500 text-center text-sm">{error}</p>}
                             </div>
-                        </CardContent>
-                    </Card>
-                </AnimatedContent>
-            </div>
-        </>
+
+                            <Tabs defaultValue="create" className="w-full">
+                                <TabsList className="grid w-full grid-cols-2">
+                                    <TabsTrigger value="create">Create Room</TabsTrigger>
+                                    <TabsTrigger value="join">Join Room</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="create">
+                                    <form action={handleCreateRoom} className="space-y-4">
+                                        <Input type="text" name="playerName" placeholder="Enter your name" required />
+                                        <Button
+                                            type="submit"
+                                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                                            disabled={isCreating || !recaptchaLoaded}
+                                        >
+                                            {isCreating ? "Creating..." : "Create Room"}
+                                        </Button>
+                                    </form>
+                                </TabsContent>
+                                <TabsContent value="join">
+                                    <form action={handleJoinRoom} className="space-y-4">
+                                        <Input type="text" name="playerName" placeholder="Enter your name" required />
+                                        <Input type="text" name="roomId" placeholder="Enter room ID" required />
+                                        <Button
+                                            type="submit"
+                                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                                            disabled={isJoining}
+                                        >
+                                            {isJoining ? "Joining..." : "Join Room"}
+                                        </Button>
+                                    </form>
+                                </TabsContent>
+                            </Tabs>
+                            {error && <p className="text-red-500 text-center text-sm">{error}</p>}
+                        </div>
+                    </CardContent>
+                </Card>
+            </AnimatedContent>
+        </div>
     )
 }
 

@@ -51,7 +51,7 @@ export default function HomePage() {
         if (!window.grecaptcha) {
             throw new Error("reCAPTCHA not loaded")
         }
-        return window.grecaptcha.execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!, { action: "create_room" })
+        return window.grecaptcha.execute(process.env.RECAPTCHA_SITE_KEY!, { action: "create_room" })
     }
 
     const handleCreateRoom = async (formData: FormData) => {

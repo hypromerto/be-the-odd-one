@@ -30,7 +30,7 @@ export default function HomePage() {
     const renderReCaptcha = useCallback(() => {
         if (window.grecaptcha && recaptchaRef.current && !recaptchaWidgetId.current) {
             recaptchaWidgetId.current = window.grecaptcha.render(recaptchaRef.current, {
-                'sitekey': process.env.RECAPTCHA_SITE_KEY,
+                'sitekey': '6LclnLwqAAAAAD3NMOKuVZ08pKfm17m0gWujXIQ0',
                 'callback': (token: string) => {
                     console.log('reCAPTCHA token:', token)
                 }

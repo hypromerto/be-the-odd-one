@@ -9,6 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createRoom, joinRoom } from "./actions"
 import AnimatedContent from "@/components/animated-content"
 import { isRedirectError } from "next/dist/client/components/redirect"
+import Script from "next/script";
+
+const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY;
 
 export default function HomePage() {
     const [isCreating, setIsCreating] = useState(false)
@@ -25,8 +28,19 @@ export default function HomePage() {
         setIsCreating(true)
         setError(null)
         try {
-            const { roomId } = await createRoom(playerName)
-            router.push(`/room/${roomId}`)
+            window.grecaptcha.ready(() => {
+                window.grecaptcha
+                    .execute(SITE_KEY, { action: "submit" })
+                    .then(async (token) => {
+                        /* send data to the server */
+                        const { roomId } = await createRoom(token, playerName)
+                        router.push(`/room/${roomId}`)
+                    }).catch((error) => {
+                        console.error("Failed to create room:", error)
+                        setError("Failed to create room. Please try again.")
+                        setIsCreating(false)
+                    })
+            })
         } catch (error) {
             if (isRedirectError(error)) throw error
             console.error("Failed to create room:", error)
@@ -57,6 +71,9 @@ export default function HomePage() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
+            <Script
+                src={`https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`}
+            />
             <AnimatedContent>
                 <Card className="w-full backdrop-blur-sm bg-white/90 shadow-xl">
                     <CardHeader>

@@ -4,6 +4,9 @@ import JoinForm from '@/components/join-form'
 import { createClient } from '@/utils/supabase/server'
 import { signInAnonymously } from "@/lib/auth"
 import { RoomState } from '@/lib/types'
+import Script from "next/script";
+
+const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY;
 
 export default async function RoomPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -37,6 +40,9 @@ export default async function RoomPage({ params }: { params: { id: string } }) {
 
   return (
       <div className="min-h-screen flex items-center justify-center p-4">
+        <Script
+            src={`https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`}
+        />
         {isPlayerInRoom ? (
             <RoomContent initialRoomState={room as RoomState} roomId={params.id} currentUserId={user.id} />
         ) : (

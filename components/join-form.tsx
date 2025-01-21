@@ -4,12 +4,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { joinRoom } from '@/app/actions'
+import {createRoom, joinRoom} from '@/app/actions'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface JoinFormProps {
     roomId: string
 }
+
+const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY;
 
 export default function JoinForm({ roomId }: JoinFormProps) {
     const [joiningName, setJoiningName] = useState('')
@@ -25,8 +27,18 @@ export default function JoinForm({ roomId }: JoinFormProps) {
         setIsJoining(true)
         setError(null)
         try {
-            await joinRoom(roomId, joiningName)
-            router.refresh()
+            window.grecaptcha.ready(() => {
+                window.grecaptcha
+                    .execute(SITE_KEY, { action: "submit" })
+                    .then(async (token) => {
+                        /* send data to the server */
+                        await joinRoom(roomId, joiningName)
+                        router.refresh()
+                    }).catch((error) => {
+                    console.error("Failed to join game:", error)
+                    setError("Failed to join game. Please try again.")
+                })
+            })
         } catch (error) {
             console.error('Failed to join game:', error)
             setError('Failed to join game. Please try again.')

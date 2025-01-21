@@ -48,7 +48,21 @@ async function updateRoomWithRetry(
   throw new Error("Failed to update room after multiple attempts")
 }
 
-export async function createRoom(playerName: string) {
+export async function createRoom(token: string, playerName: string) {
+  console.log(token)
+  const SECRET_KEY = process.env.RECAPTCHA_SECRETKEY;
+
+  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${SECRET_KEY}&response=${token}`;
+
+  try {
+    const recaptchaRes = await fetch(verifyUrl, { method: "POST" });
+
+    const recaptchaJson = await recaptchaRes.json();
+
+  } catch (e) {
+    throw new Error("Captcha Failed")
+  }
+
   const supabase = await createClient()
 
   let user = await getCurrentUser()

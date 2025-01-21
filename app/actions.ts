@@ -48,39 +48,8 @@ async function updateRoomWithRetry(
   throw new Error("Failed to update room after multiple attempts")
 }
 
-async function verifyCaptcha(token: string) {
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY
-  if (!secretKey) {
-    throw new Error("reCAPTCHA secret key not configured")
-  }
-
-  const verificationUrl = "https://www.google.com/recaptcha/api/siteverify"
-  const response = await fetch(verificationUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: `secret=${secretKey}&response=${token}`,
-  })
-
-  const data = await response.json()
-
-  // For v3, we should check the score
-  if (data.success && data.score > 0.5) {
-    return true
-  }
-
-  return false
-}
-
-export async function createRoom(playerName: string, captchaToken: string) {
+export async function createRoom(playerName: string) {
   const supabase = await createClient()
-
-  // Verify CAPTCHA
-  const isCaptchaValid = await verifyCaptcha(captchaToken)
-  if (!isCaptchaValid) {
-    throw new Error("CAPTCHA verification failed")
-  }
 
   let user = await getCurrentUser()
   if (!user) {

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,79 +10,11 @@ import { createRoom, joinRoom } from "./actions"
 import AnimatedContent from "@/components/animated-content"
 import { isRedirectError } from "next/dist/client/components/redirect"
 
-declare global {
-    interface Window {
-        grecaptcha: {
-            ready: (callback: () => void) => void
-            execute: (siteKey: string, options: { action: string }) => Promise<string>
-        }
-    }
-}
-
 export default function HomePage() {
-    const [playerName, setPlayerName] = useState("")
-    const [joinRoomId, setJoinRoomId] = useState("")
     const [isCreating, setIsCreating] = useState(false)
     const [isJoining, setIsJoining] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [recaptchaLoaded, setRecaptchaLoaded] = useState(false)
     const router = useRouter()
-    const recaptchaLoadAttempts = useRef(0)
-
-    useEffect(() => {
-        const loadRecaptcha = () => {
-            console.log("Attempting to load reCAPTCHA script...")
-            const script = document.createElement("script")
-            script.src = `https://www.google.com/recaptcha/api.js?render=${process.env.RECAPTCHA_SITE_KEY}`
-            script.async = true
-            script.defer = true
-            script.onload = () => {
-                console.log("reCAPTCHA script loaded, waiting for grecaptcha to be ready...")
-                window.grecaptcha.ready(() => {
-                    console.log("grecaptcha is ready")
-                    setRecaptchaLoaded(true)
-                })
-            }
-            script.onerror = (error) => {
-                console.error("Error loading reCAPTCHA script:", error)
-                recaptchaLoadAttempts.current += 1
-                if (recaptchaLoadAttempts.current < 3) {
-                    console.log(`Retrying reCAPTCHA load, attempt ${recaptchaLoadAttempts.current + 1}`)
-                    setTimeout(loadRecaptcha, 2000)
-                } else {
-                    setError("Failed to load reCAPTCHA. Please refresh the page and try again.")
-                }
-            }
-            document.body.appendChild(script)
-        }
-
-        loadRecaptcha()
-
-        return () => {
-            const script = document.querySelector(`script[src^="https://www.google.com/recaptcha/api.js"]`)
-            if (script) {
-                document.body.removeChild(script)
-            }
-        }
-    }, [])
-
-    const executeRecaptcha = async () => {
-        console.log("Executing reCAPTCHA...")
-        if (!window.grecaptcha) {
-            console.error("grecaptcha is not available")
-            throw new Error("reCAPTCHA not loaded")
-        }
-        try {
-            const token = await window.grecaptcha.execute(process.env.RECAPTCHA_SITE_KEY!, {
-                action: "create_room",
-            })
-            console.log("reCAPTCHA token obtained:", token.substring(0, 10) + "...")
-            return token
-        } catch (error) {
-            console.error("Error executing reCAPTCHA:", error)
-            throw error
-        }
-    }
 
     const handleCreateRoom = async (formData: FormData) => {
         const playerName = formData.get("playerName") as string
@@ -93,14 +25,7 @@ export default function HomePage() {
         setIsCreating(true)
         setError(null)
         try {
-            console.log("Creating room...")
-            if (!recaptchaLoaded) {
-                console.error("reCAPTCHA not loaded yet")
-                throw new Error("reCAPTCHA not loaded yet")
-            }
-            const token = await executeRecaptcha()
-            const { roomId } = await createRoom(playerName, token)
-            console.log("Room created successfully, redirecting...")
+            const { roomId } = await createRoom(playerName)
             router.push(`/room/${roomId}`)
         } catch (error) {
             if (isRedirectError(error)) throw error
@@ -168,9 +93,9 @@ export default function HomePage() {
                                         <Button
                                             type="submit"
                                             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
-                                            disabled={isCreating || !recaptchaLoaded}
+                                            disabled={isCreating}
                                         >
-                                            {isCreating ? "Creating..." : recaptchaLoaded ? "Create Room" : "Loading reCAPTCHA..."}
+                                            {isCreating ? "Creating..." : "Create Room"}
                                         </Button>
                                     </form>
                                 </TabsContent>

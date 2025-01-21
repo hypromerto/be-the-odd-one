@@ -50,12 +50,27 @@ async function updateRoomWithRetry(
 
 async function verifyCaptcha(token: string) {
   const secretKey = process.env.RECAPTCHA_SECRET_KEY
-  const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`
+  if (!secretKey) {
+    throw new Error("reCAPTCHA secret key not configured")
+  }
 
-  const response = await fetch(verificationUrl, { method: "POST" })
+  const verificationUrl = "https://www.google.com/recaptcha/api/siteverify"
+  const response = await fetch(verificationUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: `secret=${secretKey}&response=${token}`,
+  })
+
   const data = await response.json()
 
-  return data.success
+  // For v3, we should check the score
+  if (data.success && data.score > 0.5) {
+    return true
+  }
+
+  return false
 }
 
 export async function createRoom(playerName: string, captchaToken: string) {

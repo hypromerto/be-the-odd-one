@@ -225,11 +225,13 @@ export default function RoomContent({ initialRoomState, roomId, currentUserId }:
                     </CardContent>
                 </Card>
             </div>
-            {roomState.gameState !== "waiting" && roomState.gameState !== "theme_input" && (
-                <div className="w-full md:w-1/4">
-                    <GameProgress roomState={roomState} />
-                </div>
-            )}
+            {roomState.gameState !== "waiting" &&
+                roomState.gameState !== "theme_input" &&
+                roomState.gameState !== "game_over" && (
+                    <div className="w-full md:w-1/4">
+                        <GameProgress roomState={roomState} />
+                    </div>
+                )}
         </div>
     )
 }

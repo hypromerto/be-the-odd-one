@@ -11,6 +11,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en">
         <head>
+            <title>Be the Odd One</title>
             <Script src="https://www.google.com/recaptcha/api.js" async defer />
             <GoogleAdsense pId={AdsenseId} />
         </head>

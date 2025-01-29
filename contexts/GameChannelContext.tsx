@@ -76,6 +76,14 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
                 )
             })
             .on("broadcast", { event: "themes_submitted" }, ({ payload }) => {
+                setGameState((prev): RoomState | null =>
+                    prev
+                        ? {
+                            ...prev,
+                            themes: [...prev.themes, ...payload.themes],
+                        }
+                        : null,
+                )
             })
             .on("broadcast", { event: "answer_submitted" }, ({ payload }) => {
                 setGameState((prev): RoomState | null =>
@@ -128,23 +136,17 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
                 )
             })
             .on("broadcast", { event: "all_themes_submitted" }, async () => {
-                try {
-                    const themes = await fetchAllThemes(roomId)
-                    setGameState((prev): RoomState | null =>
-                        prev
-                            ? {
-                                ...prev,
-                                themes,
-                                game_state: "answer_input",
-                                current_round: 0,
-                            }
-                            : null,
-                    )
-                } catch (error) {
-                    console.error("Error fetching themes after all_themes_submitted:", error)
-                }
+                setGameState((prev): RoomState | null =>
+                    prev
+                        ? {
+                            ...prev,
+                            game_state: "answer_input",
+                            current_round: 0,
+                        }
+                        : null,
+                )
             })
-            .on("broadcast", { event: "all_answers_submitted" }, async ({ payload }) => {
+            .on("broadcast", { event: "all_answers_submitted" }, ({ payload }) => {
                 setGameState((prev): RoomState | null => {
                     if (!prev) return null
 
@@ -231,8 +233,47 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
                     console.error("Error fetching room data after game reset:", error)
                 }
             })
-            .subscribe((status) => {
+            .on("broadcast", { event: "theme_added" }, ({ payload }) => {
+                setGameState((prev): RoomState | null =>
+                    prev
+                        ? {
+                            ...prev,
+                            themes: [...prev.themes, payload.theme],
+                        }
+                        : null,
+                )
             })
+            .on("broadcast", { event: "theme_removed" }, ({ payload }) => {
+                setGameState((prev): RoomState | null =>
+                    prev
+                        ? {
+                            ...prev,
+                            themes: prev.themes.filter((theme) => theme.id !== payload.themeId),
+                        }
+                        : null,
+                )
+            })
+            .on("broadcast", { event: "theme_submitted" }, ({ payload }) => {
+                setGameState((prev): RoomState | null =>
+                    prev
+                        ? {
+                            ...prev,
+                            themes: [...prev.themes, payload.theme],
+                        }
+                        : null,
+                )
+            })
+            .on("broadcast", { event: "theme_removed" }, ({ payload }) => {
+                setGameState((prev): RoomState | null =>
+                    prev
+                        ? {
+                            ...prev,
+                            themes: prev.themes.filter((theme) => theme.id !== payload.themeId),
+                        }
+                        : null,
+                )
+            })
+            .subscribe((status) => {})
 
         channelRef.current = channel
 
@@ -242,7 +283,7 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
                 channelRef.current = null
             }
         }
-    }, [roomId])
+    }, [roomId, supabase]) // Added supabase to the dependency array
 
     useEffect(() => {
         if (gameState?.game_state === "answer_input") {

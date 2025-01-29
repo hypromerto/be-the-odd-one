@@ -3,9 +3,10 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { submitThemes } from "@/app/actions"
+import {submitTheme, removeTheme, startGame, sendAllThemesSubmittedEvent} from "@/app/actions"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { useGameChannel } from "@/contexts/GameChannelContext"
+import { SharedThemePool } from "./shared-theme-pool"
 
 interface ThemeInputProps {
     roomId: string
@@ -13,53 +14,48 @@ interface ThemeInputProps {
 
 export default function ThemeInput({ roomId }: ThemeInputProps) {
     const [theme, setTheme] = useState("")
-    const [themes, setThemes] = useState<Array<string>>([])
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState("")
-    const [localIsReady, setLocalIsReady] = useState(false)
-    const { gameState } = useGameChannel()
+    const { gameState, setGameState } = useGameChannel()
 
     const currentPlayer = gameState?.players.find((player) => player.user_id === gameState.currentUserId) || null
-    const isReady = currentPlayer?.theme_ready || false
+    const isHost = currentPlayer?.is_host || false
 
-    const handleAddTheme = () => {
+    const handleAddTheme = async () => {
         if (theme.trim()) {
-            setThemes((prevThemes) => [...prevThemes, theme.trim()])
-            setTheme("")
-        }
-    }
-
-    const handleRemoveTheme = (index: number) => {
-        setThemes((prevThemes) => prevThemes.filter((_, i) => i !== index))
-    }
-
-    const handleReady = async () => {
-        if (themes.length > 0 && !isSubmitting) {
-            setIsSubmitting(true)
             try {
-                await submitThemes(roomId, themes)
-                setLocalIsReady(true)
+                const newTheme = await submitTheme(roomId, theme.trim(), currentPlayer.id)
+                setTheme("")
             } catch (error) {
-                console.error("Failed to submit themes:", error)
-                setError("Failed to submit themes. Please try again.")
-            } finally {
-                setIsSubmitting(false)
+                console.error("Failed to add theme:", error)
+                setError("Failed to add theme. Please try again.")
             }
         }
     }
 
-    if (isReady || localIsReady) {
-        return (
-            <Card className="w-full">
-                <CardContent className="flex flex-col items-center space-y-4 p-6">
-                    <CardTitle className="text-2xl font-bold text-purple-700">Themes Submitted!</CardTitle>
-                    <CardDescription className="text-center">
-                        Your themes have been recorded. Please wait for other players to submit their themes.
-                    </CardDescription>
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-                </CardContent>
-            </Card>
-        )
+    const handleRemoveTheme = async (themeId: number) => {
+        if (isHost) {
+            try {
+                await removeTheme(roomId, themeId)
+            } catch (error) {
+                console.error("Failed to remove theme:", error)
+                setError("Failed to remove theme. Please try again.")
+            }
+        }
+    }
+
+    const handleStartGame = async () => {
+        if (isHost && gameState?.themes.length > 0) {
+            setIsSubmitting(true)
+            try {
+                await sendAllThemesSubmittedEvent(roomId)
+            } catch (error) {
+                console.error("Failed to start game:", error)
+                setError("Failed to start game. Please try again.")
+            } finally {
+                setIsSubmitting(false)
+            }
+        }
     }
 
     return (
@@ -67,8 +63,10 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
             <CardHeader>
                 <CardTitle className="text-xl sm:text-2xl font-bold text-indigo-800">Enter Themes</CardTitle>
                 <CardDescription className="text-sm sm:text-base text-indigo-600">
-                    The game will continue until all themes from all players are played. You can enter multiple themes to make the
-                    game longer and more fun!
+                    Add themes for the game.{" "}
+                    {isHost
+                        ? "As the host, you can remove themes and start the game."
+                        : "The host will start the game when ready."}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -87,31 +85,17 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
                         Add
                     </Button>
                 </div>
-                <div className="bg-amber-100 p-4 rounded-lg">
-                    <h3 className="font-bold mb-2 text-indigo-800">Your Themes:</h3>
-                    <ul className="space-y-2">
-                        {themes.map((t, index) => (
-                            <li key={index} className="flex items-center justify-between">
-                                <span className="text-indigo-700 text-sm">{t}</span>
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => handleRemoveTheme(index)}
-                                    className="text-red-500 hover:text-red-700 text-sm"
-                                >
-                                    Remove
-                                </Button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-                <Button
-                    onClick={handleReady}
-                    disabled={themes.length === 0 || isSubmitting}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {isSubmitting ? "Submitting..." : "Ready"}
-                </Button>
                 {error && <p className="text-red-500 text-sm">{error}</p>}
+                <SharedThemePool themes={gameState?.themes || []} isHost={isHost} onRemove={handleRemoveTheme} />
+                {isHost && (
+                    <Button
+                        onClick={handleStartGame}
+                        disabled={isSubmitting || gameState?.themes.length === 0}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {isSubmitting ? "Starting Game..." : "Start Game"}
+                    </Button>
+                )}
             </CardContent>
         </Card>
     )

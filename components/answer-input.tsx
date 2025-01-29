@@ -35,7 +35,7 @@ export default function AnswerInput({ roomId, theme }: AnswerInputProps) {
         setError(null)
 
         try {
-            await submitAnswer(roomId, answer)
+            await submitAnswer(roomId, currentPlayer.id, answer)
             setAnswer("")
             setLocalIsSubmitted(true)
         } catch (error) {

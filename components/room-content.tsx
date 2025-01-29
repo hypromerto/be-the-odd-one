@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useTranslations } from "next-intl"
+import {useLocale, useTranslations} from "next-intl"
 import { PlayerCard } from "@/components/player-card"
 import { Button } from "@/components/ui/button"
 import { startGame, resetGame } from "@/app/actions"
@@ -24,6 +24,7 @@ export default function RoomContent({ roomId, currentUserId }: RoomContentProps)
     const [isCopied, setIsCopied] = useState(false)
     const [isStartingGame, setIsStartingGame] = useState(false)
     const t = useTranslations("RoomContent")
+    const locale = useLocale()
 
     const handleStartGame = async () => {
         if (isStartingGame) return
@@ -45,7 +46,7 @@ export default function RoomContent({ roomId, currentUserId }: RoomContentProps)
     }
 
     const copyGameLink = () => {
-        const gameLink = `${window.location.origin}/room/${roomId}`
+        const gameLink = `${window.location.origin}/${locale}/room/${roomId}`
         navigator.clipboard.writeText(gameLink).then(
             () => {
                 setIsCopied(true)

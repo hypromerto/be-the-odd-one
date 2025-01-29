@@ -69,6 +69,7 @@
     "waitForHost": "The host will start the game when ready.",
     "enterTheme": "Enter a theme",
     "add": "Add",
+    "adding": "Adding...",
     "themePool": "Theme Pool",
     "noThemesSubmitted": "No themes submitted yet.",
     "by": "by",

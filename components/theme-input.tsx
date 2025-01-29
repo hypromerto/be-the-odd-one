@@ -16,6 +16,7 @@ interface ThemeInputProps {
 export default function ThemeInput({ roomId }: ThemeInputProps) {
     const [theme, setTheme] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isSubmittingTheme, setIsSubmittingTheme] = useState(false)
     const [error, setError] = useState("")
     const { gameState, setGameState } = useGameChannel()
     const t = useTranslations("ThemeInput")
@@ -24,6 +25,8 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
     const isHost = currentPlayer?.is_host || false
 
     const handleAddTheme = async () => {
+        if (isSubmittingTheme) return
+        setIsSubmittingTheme(true)
         if (theme.trim()) {
             try {
                 const newTheme = await submitTheme(roomId, theme.trim(), currentPlayer.id)
@@ -33,6 +36,7 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
                 setError("Failed to add theme. Please try again.")
             }
         }
+        setIsSubmittingTheme(false)
     }
 
     const handleRemoveTheme = async (themeId: number) => {
@@ -78,9 +82,10 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
                     />
                     <Button
                         onClick={handleAddTheme}
+                        disabled={isSubmittingTheme}
                         className="w-full sm:w-1/3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg"
                     >
-                        {t("add")}
+                        {isSubmittingTheme ? t("adding") : t("add")}
                     </Button>
                 </div>
                 {error && <p className="text-red-500 text-sm">{error}</p>}

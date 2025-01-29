@@ -1,5 +1,5 @@
 {
-  "gameName": "Farklı Olan Sen Ol",
+  "gameName": "Be the Odd One",
   "gameDescription": "Benzersiz cevaplarınla öne çık!",
   "howToPlay": "Nasıl Oynanır:",
   "howToPlaySteps": {
@@ -26,7 +26,7 @@
     "answerSubmitted": "Cevabınızı gönderdiniz. Lütfen diğer oyuncuların cevaplarını göndermesini bekleyin.",
     "reviewNotAvailable": "İnceleme mevcut değil",
     "waitForGameProgress": "Lütfen oyunun ilerlemesini bekleyin.",
-    "gameName": "Farklı Olan Sen Ol",
+    "gameName": "Be the Odd One",
     "roomId": "Oda ID",
     "copied": "Kopyalandı!",
     "copyGameLink": "Oyun Bağlantısını Kopyala",

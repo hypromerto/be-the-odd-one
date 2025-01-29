@@ -32,7 +32,6 @@ export default function RoomContent({ roomId, currentUserId }: RoomContentProps)
             await startGame(roomId)
         } catch (error) {
             console.error("Failed to start game:", error)
-        } finally {
             setIsStartingGame(false)
         }
     }

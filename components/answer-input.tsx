@@ -43,7 +43,6 @@ export default function AnswerInput({ roomId, theme }: AnswerInputProps) {
         } catch (error) {
             console.error("Failed to submit answer:", error)
             setError("Failed to submit answer. Please try again.")
-        } finally {
             setIsSubmitting(false)
         }
     }

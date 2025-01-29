@@ -41,7 +41,6 @@ export default function GameResults({ players, themes, roomId, isHost }: GameRes
             await resetGame(roomId)
         } catch (error) {
             console.error("Failed to reset game:", error)
-        } finally {
             setIsResettingGame(false)
         }
     }

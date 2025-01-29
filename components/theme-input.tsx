@@ -54,7 +54,6 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
             } catch (error) {
                 console.error("Failed to start game:", error)
                 setError("Failed to start game. Please try again.")
-            } finally {
                 setIsSubmitting(false)
             }
         }

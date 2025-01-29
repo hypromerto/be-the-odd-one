@@ -1,71 +1,30 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { markAnswerInvalid, finishReview } from '@/app/actions'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { markAnswerInvalid, finishReview } from "@/app/actions"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Info, Lightbulb, Users } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import {Theme} from "@/lib/types";
 
 interface AnswerReviewScreenProps {
     roomId: string
-    theme: {
-        question: string
-        author: string
-        answers: Array<{
-            playerId: string
-            playerName: string
-            answer: string
-            invalid: boolean
-        }>
-    }
+    theme: Theme
     isHost: boolean
 }
 
 export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerReviewScreenProps) {
-    const [invalidAnswers, setInvalidAnswers] = useState<string[]>(
-        theme.answers.filter(answer => answer.invalid).map(answer => answer.playerId)
-    )
-    const [currentUser, setCurrentUser] = useState<any>(null)
     const [isFinishingReview, setIsFinishingReview] = useState(false)
-    const supabase = createClientComponentClient()
 
-    useEffect(() => {
-        const fetchCurrentUser = async () => {
-            const { data: { user } } = await supabase.auth.getUser()
-            setCurrentUser(user)
-        }
-        fetchCurrentUser()
-
-        // Subscribe to real-time updates for invalid answers
-        const channel = supabase.channel(`room:${roomId}`)
-        channel
-            .on('broadcast', { event: 'answer_invalidated' }, ({ payload }) => {
-                setInvalidAnswers(prev => [...prev, payload.answerId])
-            })
-            .subscribe()
-
-        return () => {
-            supabase.removeChannel(channel)
-        }
-    }, [supabase, roomId])
-
-    const handleMarkInvalid = async (playerId: string) => {
+    const handleMarkInvalid = async (answerId: string) => {
         if (!isHost) return
         try {
-            await markAnswerInvalid(roomId, playerId)
-            setInvalidAnswers(prev => [...prev, playerId])
-            // Broadcast the invalidation to other players
-            await supabase.channel(`room:${roomId}`).send({
-                type: 'broadcast',
-                event: 'answer_invalidated',
-                payload: { answerId: playerId }
-            })
+            await markAnswerInvalid(roomId, answerId)
         } catch (error) {
-            console.error('Failed to mark answer as invalid:', error)
+            console.error("Failed to mark answer as invalid:", error)
         }
     }
 
@@ -73,9 +32,9 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
         if (isFinishingReview) return
         setIsFinishingReview(true)
         try {
-            await finishReview(roomId)
+            await finishReview(roomId, theme.id)
         } catch (error) {
-            console.error('Failed to finish review:', error)
+            console.error("Failed to finish review:", error)
         } finally {
             setIsFinishingReview(false)
         }
@@ -87,7 +46,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
         if (!acc[lowerCaseAnswer]) {
             acc[lowerCaseAnswer] = []
         }
-        acc[lowerCaseAnswer].push(answer.playerId)
+        acc[lowerCaseAnswer].push(answer.id)
         return acc
     }, {})
 
@@ -95,8 +54,9 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
 
     // Identify players who won't earn points this round
     const playersWithoutPoints = theme.answers
-        .filter(answer => duplicateAnswers.includes(answer.playerId) || invalidAnswers.includes(answer.playerId))
-        .map(answer => answer.playerName)
+        .filter(answer => duplicateAnswers.includes(answer.id) || answer.invalid)
+        .map(answer => answer.player_name)
+
 
     return (
         <motion.div
@@ -108,8 +68,12 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
         >
             <Card className="w-full">
                 <CardHeader>
-                    <CardTitle className="text-xl sm:text-2xl font-bold text-indigo-800">Answers for the theme: {theme.question}</CardTitle>
-                    <CardDescription className="text-sm sm:text-base">Theme by: <span className="font-bold text-indigo-600">{theme.author}</span></CardDescription>
+                    <CardTitle className="text-xl sm:text-2xl font-bold text-indigo-800">
+                        Answers for the theme: {theme.question}
+                    </CardTitle>
+                    <CardDescription className="text-sm sm:text-base">
+                        Theme by: <span className="font-bold text-indigo-600">{theme.author.name}</span>
+                    </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {isHost && (
@@ -133,12 +97,12 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <AnimatePresence>
                             {theme.answers.map((answer, index) => {
-                                const isDuplicate = duplicateAnswers.includes(answer.playerId)
-                                const isInvalid = invalidAnswers.includes(answer.playerId)
+                                const isDuplicate = duplicateAnswers.includes(answer.id)
+                                const isInvalid = answer.invalid
                                 const isUnique = !isDuplicate && !isInvalid
                                 return (
                                     <motion.div
-                                        key={answer.playerId}
+                                        key={`${answer.id}-${index}`}
                                         layout
                                         initial={{ opacity: 0, scale: 0.8 }}
                                         animate={{ opacity: 1, scale: 1 }}
@@ -147,14 +111,14 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                                     >
                                         <Card
                                             className={`
-                        ${isUnique ? 'border-green-500 bg-green-50' : 'border-yellow-500 bg-yellow-50'}
-                        ${isInvalid ? 'border-red-500 bg-red-50' : ''}
+                        ${isUnique ? "border-green-500 bg-green-50" : "border-yellow-500 bg-yellow-50"}
+                        ${isInvalid ? "border-red-500 bg-red-50" : ""}
                         hover:bg-indigo-100 transition-colors duration-200 border-2 flex flex-col w-full h-[200px]
                       `}
                                         >
                                             <CardContent className="p-5 flex flex-col justify-between h-full">
                                                 <div>
-                                                    <p className="font-bold text-base text-indigo-700">{answer.playerName}</p>
+                                                    <p className="font-bold text-base text-indigo-700">{answer.player_name}</p>
                                                     <p className="text-gray-700 text-sm mt-1 line-clamp-2">{answer.answer}</p>
                                                 </div>
                                                 <div className="mt-2">
@@ -162,11 +126,16 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                                                         <TooltipProvider>
                                                             <Tooltip>
                                                                 <TooltipTrigger asChild>
-                                                                    <Alert variant="default" className={`${isDuplicate ? 'bg-yellow-100 border-yellow-200' : 'bg-red-100 border-red-200'} p-2`}>
+                                                                    <Alert
+                                                                        variant="default"
+                                                                        className={`${isDuplicate ? "bg-yellow-100 border-yellow-200" : "bg-red-100 border-red-200"} p-2`}
+                                                                    >
                                                                         <div className="flex items-center w-full">
                                                                             <Lightbulb className="h-4 w-4 flex-shrink-0 mr-2" />
-                                                                            <AlertTitle className={`${isDuplicate ? 'text-yellow-700' : 'text-red-700'} text-sm font-semibold flex-grow`}>
-                                                                                {isDuplicate ? 'Duplicate Answer' : 'Invalid Answer'}
+                                                                            <AlertTitle
+                                                                                className={`${isDuplicate ? "text-yellow-700" : "text-red-700"} text-sm font-semibold flex-grow`}
+                                                                            >
+                                                                                {isDuplicate ? "Duplicate Answer" : "Invalid Answer"}
                                                                             </AlertTitle>
                                                                         </div>
                                                                     </Alert>
@@ -183,7 +152,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                                                     )}
                                                     {isHost && !isInvalid && !isDuplicate && (
                                                         <Button
-                                                            onClick={() => handleMarkInvalid(answer.playerId)}
+                                                            onClick={() => handleMarkInvalid(answer.id)}
                                                             className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg transform hover:scale-105 transition-transform duration-200 text-sm"
                                                         >
                                                             Mark as Invalid
@@ -203,10 +172,14 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                             disabled={isFinishingReview}
                             className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200 mt-6"
                         >
-                            {isFinishingReview ? 'Finishing Review...' : 'Finish Review'}
+                            {isFinishingReview ? "Finishing Review..." : "Finish Review"}
                         </Button>
                     )}
-                    {!isHost && <p className="text-base sm:text-lg text-indigo-600 font-bold mt-6">Waiting for the host to finish reviewing answers...</p>}
+                    {!isHost && (
+                        <p className="text-base sm:text-lg text-indigo-600 font-bold mt-6">
+                            Waiting for the host to finish reviewing answers...
+                        </p>
+                    )}
                 </CardContent>
             </Card>
         </motion.div>

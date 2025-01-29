@@ -1,4 +1,4 @@
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from "@/utils/supabase/client"
 
 export async function signInAnonymously() {
     const supabase = await createClient()
@@ -17,4 +17,3 @@ export async function getCurrentUser() {
     const { data: { user } } = await supabase.auth.getUser()
     return user
 }
-

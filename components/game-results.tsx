@@ -6,40 +6,29 @@ import { Button } from "@/components/ui/button"
 import confetti from "canvas-confetti"
 import { resetGame } from "@/app/actions"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-
-interface PlayerScore {
-    id: string
-    name: string
-    avatar: string
-    score: number
-}
+import {PlayerScore, Theme} from "@/lib/types";
 
 interface GameResultsProps {
     players: PlayerScore[]
-    themes: Array<{
-        question: string
-        author: string
-        answers: Array<{
-            playerId: string
-            playerName: string
-            answer: string
-            pointAwarded: boolean
-        }>
-    }>
+    themes: Theme[]
     roomId: string
     isHost: boolean
 }
 
 export default function GameResults({ players, themes, roomId, isHost }: GameResultsProps) {
+    const [confettiTrigger, setConfettiTrigger] = useState(0)
     const [isResettingGame, setIsResettingGame] = useState(false)
 
-    const doConfetti = () => {
-        confetti({
-            particleCount: 200,
-            spread: 70,
-            origin: { y: 0.6 },
-        })
-    }
+    useEffect(() => {
+        if (confettiTrigger > 0) {
+            confetti({
+                particleCount: 200,
+                spread: 70,
+                origin: { y: 0.6 },
+            })
+        }
+    }, [confettiTrigger])
+
 
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score)
     const winner = sortedPlayers[0]
@@ -80,7 +69,7 @@ export default function GameResults({ players, themes, roomId, isHost }: GameRes
                     </div>
                     <Button
                         className="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-300"
-                        onClick={doConfetti}
+                        onClick={() => setConfettiTrigger((prev) => prev + 1)}
                     >
                         Celebrate!
                     </Button>
@@ -110,21 +99,21 @@ export default function GameResults({ players, themes, roomId, isHost }: GameRes
 
             <div className="w-full mt-6">
                 <h3 className="text-xl sm:text-2xl font-bold mb-4">Theme Summary</h3>
-                {themes.map((theme, index) => (
-                    <Card key={index} className="bg-white rounded-lg shadow-md p-4 mb-4">
+                {themes.map((theme) => (
+                    <Card key={theme.id} className="bg-white rounded-lg shadow-md p-4 mb-4">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-lg sm:text-xl font-semibold text-indigo-800">{theme.question}</CardTitle>
-                            <CardDescription className="text-sm text-indigo-600">by {theme.author}</CardDescription>
+                            <CardDescription className="text-sm text-indigo-600">by {theme.author.name}</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <ul className="space-y-2">
-                                {theme.answers.map((answer, i) => (
+                                {theme.answers.map((answer) => (
                                     <li
-                                        key={i}
+                                        key={answer.id}
                                         className="text-sm sm:text-base flex justify-between items-center py-1 border-b border-gray-100 last:border-b-0"
                                     >
-                                        <span className="font-semibold text-indigo-700 mr-2">{answer.playerName}:</span>
-                                        <span className={`flex-1 ${answer.pointAwarded ? "text-green-600 font-medium" : "text-gray-600"}`}>
+                                        <span className="font-semibold text-indigo-700 mr-2">{answer.player_name}:</span>
+                                        <span className={`flex-1 ${!answer.invalid ? "text-green-600 font-medium" : "text-gray-600"}`}>
                       {answer.answer}
                     </span>
                                     </li>

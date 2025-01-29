@@ -14,19 +14,19 @@ export default function GameProgress({ roomState }: GameProgressProps) {
 
     useEffect(() => {
         const totalQuestions = roomState.themes.length
-        const answeredQuestions = roomState.currentRound
-        const calculatedProgress = (answeredQuestions / totalQuestions) * 100
+        const answeredQuestions = roomState.current_round
+        const calculatedProgress = totalQuestions > 0 ? (answeredQuestions / totalQuestions) * 100 : 0
         setProgress(calculatedProgress)
-    }, [roomState.themes.length, roomState.currentRound])
+    }, [roomState.themes.length, roomState.current_round, roomState.players])
 
-    const sortedPlayers = [...roomState.players].sort((a, b) => (b.score || 0) - (a.score || 0))
+    const sortedPlayers = [...roomState.players].sort((a, b) => b.score - a.score)
 
     return (
         <Card className="w-full bg-white shadow-sm">
             <CardContent className="p-4 space-y-4">
                 <div className="flex justify-between items-center mb-2">
                     <div className="text-sm font-medium text-indigo-600 whitespace-nowrap">
-                        Questions: {roomState.currentRound} / {roomState.themes.length}
+                        Questions: {roomState.current_round + 1} / {roomState.themes.length}
                     </div>
                 </div>
                 <Progress value={progress} className="w-full h-2" />

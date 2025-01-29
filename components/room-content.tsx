@@ -1,90 +1,27 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { PlayerCard } from "@/components/player-card"
-import { Button } from "@/components/ui/button"
-import { startGame } from "@/app/actions"
+import {useState, useEffect} from "react"
+import {PlayerCard} from "@/components/player-card"
+import {Button} from "@/components/ui/button"
+import {startGame, resetGame} from "@/app/actions"
 import ThemeInput from "@/components/theme-input"
 import AnswerInput from "@/components/answer-input"
 import AnswerReviewScreen from "@/components/answer-review-screen"
 import GameResults from "@/components/game-results"
 import GameProgress from "@/components/game-progress"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import type { RoomState } from "@/lib/types"
-import { Copy, Check } from "lucide-react"
+import {Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card"
+import {Copy, Check} from "lucide-react"
+import {useGameChannel} from "@/contexts/GameChannelContext"
 
 interface RoomContentProps {
-    initialRoomState: RoomState
     roomId: string
     currentUserId: string
 }
 
-export default function RoomContent({ initialRoomState, roomId, currentUserId }: RoomContentProps) {
-    const [roomState, setRoomState] = useState<RoomState>(initialRoomState)
+export default function RoomContent({roomId, currentUserId}: RoomContentProps) {
+    const {gameState} = useGameChannel()
     const [isCopied, setIsCopied] = useState(false)
     const [isStartingGame, setIsStartingGame] = useState(false)
-    const supabase = createClientComponentClient()
-
-    useEffect(() => {
-        const channel = supabase.channel(roomId)
-
-        const subscription = channel
-            .on("broadcast", { event: "player_joined" }, (payload) => {
-                setRoomState((prevState) => {
-                    const updatedPlayers = [...prevState.players]
-                    if (!updatedPlayers.some((player) => player.id === payload.payload.player_id)) {
-                        updatedPlayers.push({
-                            id: payload.payload.player_id,
-                            name: payload.payload.player_name,
-                            avatar: payload.payload.avatar,
-                            isHost: false,
-                            ready: false,
-                        })
-                    }
-                    return { ...prevState, players: updatedPlayers }
-                })
-            })
-            .on("broadcast", { event: "game_started" }, () => {
-                fetchRoomData()
-            })
-            .on("broadcast", { event: "all_players_ready" }, () => {
-                fetchRoomData()
-            })
-            .on("broadcast", { event: "answer_submitted" }, () => {
-                fetchRoomData()
-            })
-            .on("broadcast", { event: "all_answers_submitted" }, () => {
-                fetchRoomData()
-            })
-            .on("broadcast", { event: "review_finished" }, () => {
-                fetchRoomData()
-            })
-            .on("broadcast", { event: "game_over" }, () => {
-                fetchRoomData()
-            })
-            .on("broadcast", { event: "game_reset" }, () => {
-                fetchRoomData()
-            })
-            .on("broadcast", { event: "answer_invalidated" }, () => {
-                fetchRoomData()
-            })
-            .subscribe()
-
-        return () => {
-            supabase.removeChannel(channel)
-        }
-    }, [roomId, supabase])
-
-    const fetchRoomData = async () => {
-        const { data, error } = await supabase.from("rooms").select("*").eq("roomId", roomId).single()
-
-        if (error) {
-            console.error("Error fetching room data:", error)
-        } else if (data) {
-            setRoomState(data)
-        }
-    }
 
     const handleStartGame = async () => {
         if (isStartingGame) return
@@ -95,6 +32,14 @@ export default function RoomContent({ initialRoomState, roomId, currentUserId }:
             console.error("Failed to start game:", error)
         } finally {
             setIsStartingGame(false)
+        }
+    }
+
+    const handleResetGame = async () => {
+        try {
+            await resetGame(roomId)
+        } catch (error) {
+            console.error("Failed to reset game:", error)
         }
     }
 
@@ -111,21 +56,93 @@ export default function RoomContent({ initialRoomState, roomId, currentUserId }:
         )
     }
 
-    const isHost = roomState.players.some((player) => player.id === currentUserId && player.isHost)
-    const currentTheme = roomState.themes[roomState.currentRound]
-    const hasAnswered = currentTheme?.answers.some((answer) => answer.playerId === currentUserId)
+    if (!gameState) {
+        return (
+            <Card className="w-full">
+                <CardContent className="flex flex-col items-center space-y-4 p-6">
+                    <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">Loading game
+                        state...</CardTitle>
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+                </CardContent>
+            </Card>
+        )
+    }
+
+    const isHost = gameState?.players?.some((player) => player.user_id === currentUserId && player.is_host) || false
+    const currentTheme = gameState?.themes?.[gameState.current_round]
+    const hasAnswered = currentTheme?.answers?.some((answer) => answer.player_id === currentUserId) || false
+
+    const renderGameContent = () => {
+        switch (gameState.game_state) {
+            case "theme_input":
+                return <ThemeInput roomId={roomId}/>
+            case "answer_input":
+                return currentTheme && !hasAnswered ? (
+                    <AnswerInput roomId={roomId} theme={currentTheme.question}/>
+                ) : (
+                    <Card className="w-full">
+                        <CardContent className="flex flex-col items-center space-y-4 p-6">
+                            <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">Waiting for other
+                                players</CardTitle>
+                            <CardDescription className="text-center">
+                                You've submitted your answer. Please wait for other players to submit their answers.
+                            </CardDescription>
+                            <div
+                                className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+                        </CardContent>
+                    </Card>
+                )
+            case "review":
+                return currentTheme ? (
+                    <AnswerReviewScreen
+                        roomId={roomId}
+                        theme={currentTheme}
+                        isHost={isHost}
+                    />
+                ) : (
+                    <Card className="w-full">
+                        <CardContent className="flex flex-col items-center space-y-4 p-6">
+                            <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">Review not
+                                available</CardTitle>
+                            <CardDescription className="text-center">Please wait for the game to
+                                progress.</CardDescription>
+                        </CardContent>
+                    </Card>
+                )
+            case "game_over":
+                return (
+                    <GameResults
+                        players={gameState.players.map((player) => {
+                            return {
+                                id: player.id,
+                                name: player.name,
+                                avatar: player.avatar,
+                                score: player.score,
+                            }
+                        }) || []}
+                        themes={gameState.themes || []}
+                        roomId={roomId}
+                        isHost={isHost}
+                    />
+                )
+            default:
+                return null
+        }
+    }
 
     return (
         <div className="flex flex-col md:flex-row justify-center items-start gap-4 w-full max-w-7xl mx-auto">
             <div
-                className={`w-full ${roomState.gameState !== "waiting" && roomState.gameState !== "theme_input" ? "md:w-3/4" : "md:max-w-2xl"}`}
+                className={`w-full ${gameState.game_state !== "waiting" && gameState.game_state !== "theme_input" ? "md:w-3/4" : "md:max-w-2xl"}`}
             >
                 <Card className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg">
                     <CardHeader className="space-y-2">
-                        <CardTitle className="text-2xl sm:text-3xl font-bold text-center text-indigo-800">Be the Odd One</CardTitle>
-                        {roomState.gameState === "waiting" && (
+                        <CardTitle className="text-2xl sm:text-3xl font-bold text-center text-indigo-800">Be the Odd
+                            One</CardTitle>
+                        {gameState.game_state === "waiting" && (
                             <div className="flex flex-col items-center space-y-2">
-                                <CardDescription className="text-lg sm:text-xl text-center bg-amber-200 py-2 px-4 rounded-full inline-block">
+                                <CardDescription
+                                    className="text-lg sm:text-xl text-center bg-amber-200 py-2 px-4 rounded-full inline-block">
                                     Room ID: <span className="font-bold text-indigo-700">{roomId}</span>
                                 </CardDescription>
                                 <Button
@@ -134,102 +151,73 @@ export default function RoomContent({ initialRoomState, roomId, currentUserId }:
                                 >
                                     {isCopied ? (
                                         <>
-                                            <Check className="w-4 h-4 mr-2" />
+                                            <Check className="w-4 h-4 mr-2"/>
                                             Copied!
                                         </>
                                     ) : (
                                         <>
-                                            <Copy className="w-4 h-4 mr-2" />
+                                            <Copy className="w-4 h-4 mr-2"/>
                                             Copy Game Link
                                         </>
                                     )}
                                 </Button>
-                                <p className="text-sm text-gray-600 mt-2">Share this link with others to invite them to the game!</p>
+                                <p className="text-sm text-gray-600 mt-2">Share this link with others to invite them to
+                                    the game!</p>
                             </div>
                         )}
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        <div>
-                            {roomState.gameState === "waiting" ? (
-                                <div className="space-y-4">
-                                    <h2 className="text-xl sm:text-2xl text-indigo-800">Players:</h2>
-                                    <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
-                                        {roomState.players.map((player, index) => (
-                                            <PlayerCard
-                                                key={index}
-                                                name={player.name}
-                                                avatar={player.avatar}
-                                                isHost={player.isHost}
-                                                ready={player.ready}
-                                            />
-                                        ))}
-                                    </div>
-                                    {roomState.players.length < 3 && (
-                                        <div className="mt-4 p-4 bg-yellow-100 rounded-lg">
-                                            <p className="text-yellow-800 text-sm sm:text-base">
-                                                At least 3 players are required to start the game. Invite more players to join!
-                                            </p>
-                                        </div>
-                                    )}
-                                    {isHost && roomState.players.length >= 3 && (
-                                        <Button
-                                            onClick={handleStartGame}
-                                            disabled={isStartingGame}
-                                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200"
-                                        >
-                                            {isStartingGame ? "Starting Game..." : "Start Game"}
-                                        </Button>
-                                    )}
-                                    {isHost && roomState.players.length < 3 && (
-                                        <Button
-                                            disabled
-                                            className="w-full bg-gray-400 text-white font-bold py-2 px-4 rounded-full text-lg cursor-not-allowed"
-                                        >
-                                            Need at least 3 players to start
-                                        </Button>
-                                    )}
-                                </div>
-                            ) : (
-                                <div>
-                                    {roomState.gameState === "theme_input" && <ThemeInput roomId={roomId} />}
-                                    {roomState.gameState === "answer_input" && currentTheme && !hasAnswered && (
-                                        <AnswerInput roomId={roomId} theme={currentTheme.question} />
-                                    )}
-                                    {roomState.gameState === "answer_input" && currentTheme && hasAnswered && (
-                                        <Card className="w-full">
-                                            <CardContent className="flex flex-col items-center space-y-4 p-6">
-                                                <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">
-                                                    Waiting for other players
-                                                </CardTitle>
-                                                <CardDescription className="text-center">
-                                                    You've submitted your answer. Please wait for other players to submit their answers.
-                                                </CardDescription>
-                                                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-                                            </CardContent>
-                                        </Card>
-                                    )}
-                                    {roomState.gameState === "review" && currentTheme && (
-                                        <AnswerReviewScreen roomId={roomId} theme={currentTheme} isHost={isHost} />
-                                    )}
-                                    {roomState.gameState === "game_over" && (
-                                        <GameResults
-                                            players={roomState.players}
-                                            themes={roomState.themes}
-                                            roomId={roomId}
-                                            isHost={isHost}
+                        {gameState.game_state === "waiting" ? (
+                            <div className="space-y-4">
+                                <h2 className="text-xl sm:text-2xl text-indigo-800">Players:</h2>
+                                <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+                                    {gameState.players.map((player, index) => (
+                                        <PlayerCard
+                                            key={index}
+                                            name={player.name}
+                                            avatar={player.avatar}
+                                            isHost={player.is_host}
+                                            ready={player.ready}
                                         />
-                                    )}
+                                    ))}
                                 </div>
-                            )}
-                        </div>
+                                {gameState.players.length < 3 && (
+                                    <div className="mt-4 p-4 bg-yellow-100 rounded-lg">
+                                        <p className="text-yellow-800 text-sm sm:text-base">
+                                            At least 3 players are required to start the game. Invite more players to
+                                            join!
+                                        </p>
+                                    </div>
+                                )}
+                                {isHost && gameState.players.length >= 3 && (
+                                    <Button
+                                        onClick={handleStartGame}
+                                        disabled={isStartingGame}
+                                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200"
+                                    >
+                                        {isStartingGame ? "Starting Game..." : "Start Game"}
+                                    </Button>
+                                )}
+                                {isHost && gameState.players.length < 3 && (
+                                    <Button
+                                        disabled
+                                        className="w-full bg-gray-400 text-white font-bold py-2 px-4 rounded-full text-lg cursor-not-allowed"
+                                    >
+                                        Need at least 3 players to start
+                                    </Button>
+                                )}
+                            </div>
+                        ) : (
+                            renderGameContent()
+                        )}
                     </CardContent>
                 </Card>
             </div>
-            {roomState.gameState !== "waiting" &&
-                roomState.gameState !== "theme_input" &&
-                roomState.gameState !== "game_over" && (
+            {gameState.game_state !== "waiting" &&
+                gameState.game_state !== "theme_input" &&
+                gameState.game_state !== "game_over" && (
                     <div className="w-full md:w-1/4">
-                        <GameProgress roomState={roomState} />
+                        <GameProgress roomState={gameState}/>
                     </div>
                 )}
         </div>

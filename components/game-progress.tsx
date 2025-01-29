@@ -14,7 +14,7 @@ export default function GameProgress({ roomState }: GameProgressProps) {
 
     useEffect(() => {
         const totalQuestions = roomState.themes.length
-        const answeredQuestions = roomState.current_round
+        const answeredQuestions = roomState.current_round + 1
         const calculatedProgress = totalQuestions > 0 ? (answeredQuestions / totalQuestions) * 100 : 0
         setProgress(calculatedProgress)
     }, [roomState.themes.length, roomState.current_round, roomState.players])

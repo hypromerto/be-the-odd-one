@@ -1,7 +1,7 @@
 import RoomContent from "@/components/room-content"
 import JoinForm from "@/components/join-form"
 import { createClient } from "@/utils/supabase/server"
-import { getCurrentUser } from "@/lib/auth"
+import {getCurrentUser, signInAnonymously} from "@/lib/auth"
 import Script from "next/script"
 import { GameChannelProvider } from "@/contexts/GameChannelContext"
 
@@ -9,7 +9,11 @@ const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY
 
 export default async function RoomPage({ params }: { params: { id: string } }) {
     const supabase = await createClient()
-    const user = await getCurrentUser()
+
+    let user = await getCurrentUser()
+    if (!user) {
+        user = await signInAnonymously()
+    }
 
     if (!user) {
         return <div>Unable to authenticate. Please try again later.</div>

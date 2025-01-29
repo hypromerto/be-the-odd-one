@@ -32,7 +32,7 @@ export async function createRoom(token: string, playerName: string) {
 
     const {data: roomData, error: roomError} = await supabase
         .from("rooms")
-        .insert({room_id: roomId, game_state: "waiting"})
+        .insert({room_id: roomId, game_state: "waiting", current_round: 0})
         .select()
         .single()
 
@@ -171,6 +171,8 @@ export async function submitAnswer(roomId: string, playerId: number, answer: str
         console.error("Error fetching room:", roomError)
         throw new Error("Failed to fetch room data")
     }
+
+    console.log(room)
 
     const currentTheme = room.themes[room.current_round]
 

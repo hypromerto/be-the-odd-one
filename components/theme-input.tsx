@@ -1,9 +1,10 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {submitTheme, removeTheme, startGame, sendAllThemesSubmittedEvent} from "@/app/actions"
+import { submitTheme, removeTheme, sendAllThemesSubmittedEvent } from "@/app/actions"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { useGameChannel } from "@/contexts/GameChannelContext"
 import { SharedThemePool } from "./shared-theme-pool"
@@ -17,6 +18,7 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [error, setError] = useState("")
     const { gameState, setGameState } = useGameChannel()
+    const t = useTranslations("ThemeInput")
 
     const currentPlayer = gameState?.players.find((player) => player.user_id === gameState.currentUserId) || null
     const isHost = currentPlayer?.is_host || false
@@ -61,12 +63,9 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
     return (
         <Card className="w-full">
             <CardHeader>
-                <CardTitle className="text-xl sm:text-2xl font-bold text-indigo-800">Enter Themes</CardTitle>
+                <CardTitle className="text-xl sm:text-2xl font-bold text-indigo-800">{t("enterThemes")}</CardTitle>
                 <CardDescription className="text-sm sm:text-base text-indigo-600">
-                    Add themes for the game.{" "}
-                    {isHost
-                        ? "As the host, you can remove themes and start the game."
-                        : "The host will start the game when ready."}
+                    {t("addThemesInstructions")} {isHost ? t("hostInstructions") : t("waitForHost")}
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -75,25 +74,25 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
                         type="text"
                         value={theme}
                         onChange={(e) => setTheme(e.target.value)}
-                        placeholder="Enter a theme"
+                        placeholder={t("enterTheme")}
                         className="w-full sm:w-2/3 border-2 border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                     />
                     <Button
                         onClick={handleAddTheme}
                         className="w-full sm:w-1/3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg"
                     >
-                        Add
+                        {t("add")}
                     </Button>
                 </div>
                 {error && <p className="text-red-500 text-sm">{error}</p>}
-                <SharedThemePool themes={gameState?.themes || []} isHost={isHost} onRemove={handleRemoveTheme} />
+                <SharedThemePool themes={gameState?.themes || []} isHost={isHost} onRemove={handleRemoveTheme} t={t} />
                 {isHost && (
                     <Button
                         onClick={handleStartGame}
                         disabled={isSubmitting || gameState?.themes.length === 0}
                         className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {isSubmitting ? "Starting Game..." : "Start Game"}
+                        {isSubmitting ? t("startingGame") : t("startGame")}
                     </Button>
                 )}
             </CardContent>

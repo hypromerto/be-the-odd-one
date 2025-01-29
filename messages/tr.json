@@ -1,0 +1,103 @@
+{
+  "gameName": "Farklı Olan Sen Ol",
+  "gameDescription": "Benzersiz cevaplarınla öne çık!",
+  "howToPlay": "Nasıl Oynanır:",
+  "howToPlaySteps": {
+    "1": "Oyuncular sırayla tema belirler.",
+    "2": "Herkes her tema için benzersiz cevaplar bulmak için yarışır.",
+    "3": "Farklı olan cevabı vererek puan kazan!",
+    "4": "Oyunu başlatmak için en az 3 oyuncu gereklidir."
+  },
+  "createRoom": "Oda Oluştur",
+  "joinRoom": "Odaya Katıl",
+  "enterName": "Adınızı girin",
+  "enterRoomId": "Oda ID'sini girin",
+  "creating": "Oluşturuluyor...",
+  "joining": "Katılınıyor...",
+  "LanguageSwitcher": {
+    "switchToEnglish": "Switch to English",
+    "switchToTurkish": "Türkçe'ye geç"
+  },
+  "switchToEnglish": "Switch to English",
+  "switchToTurkish": "Türkçe'ye geç",
+  "RoomContent": {
+    "loadingGameState": "Yükleniyor...",
+    "waitingForOtherPlayers": "Diğer oyuncular bekleniyor",
+    "answerSubmitted": "Cevabınızı gönderdiniz. Lütfen diğer oyuncuların cevaplarını göndermesini bekleyin.",
+    "reviewNotAvailable": "İnceleme mevcut değil",
+    "waitForGameProgress": "Lütfen oyunun ilerlemesini bekleyin.",
+    "gameName": "Farklı Olan Sen Ol",
+    "roomId": "Oda ID",
+    "copied": "Kopyalandı!",
+    "copyGameLink": "Oyun Bağlantısını Kopyala",
+    "shareLink": "Bu bağlantıyı başkalarıyla paylaşarak onları oyuna davet edin!",
+    "players": "Oyuncular",
+    "needMorePlayers": "Oyunu başlatmak için en az 3 oyuncu gereklidir. Daha fazla oyuncu davet edin!",
+    "startingGame": "Oyun Başlatılıyor...",
+    "startGame": "Oyunu Başlat",
+    "needThreePlayers": "Başlatmak için en az 3 oyuncu gerekiyor"
+  },
+  "GameResults": {
+    "gameResults": "Oyun Sonuçları",
+    "winner": "Kazanan",
+    "celebrate": "Kutla!",
+    "themeSummary": "Tema Özeti",
+    "by": "yazan",
+    "playAgain": "Tekrar Oyna",
+    "resettingGame": "Oyun Sıfırlanıyor...",
+    "waitingForHost": "Oda sahibinin yeni bir oyun başlatmasını bekliyoruz..."
+  },
+  "AnswerReviewScreen": {
+    "answersForTheme": "Tema için cevaplar:",
+    "themeBy": "Tema sahibi:",
+    "hostInstructions": "Oda Sahibi Talimatları",
+    "hostInstructionsText": "Oda sahibi olarak, cevapları inceleyin ve temayla ilgisiz veya esasen tekrar eden cevapları geçersiz olarak işaretleyin.",
+    "playersNotEarningPoints": "Bu turda puan kazanamayan oyuncular:",
+    "duplicateAnswer": "Tekrar Eden Cevap",
+    "invalidAnswer": "Geçersiz Cevap",
+    "duplicateTooltip": "Bu cevap başka bir oyuncunun cevabıyla eşleşiyor. Puan verilmedi.",
+    "invalidTooltip": "Oda sahibi bu cevabı bu tur için geçersiz olarak işaretledi. Puan verilmeyecek.",
+    "markAsInvalid": "Geçersiz Olarak İşaretle",
+    "finishingReview": "İnceleme Tamamlanıyor...",
+    "finishReview": "İncelemeyi Tamamla",
+    "waitingForHost": "Oda sahibinin cevapları incelemeyi bitirmesi bekleniyor..."
+  },
+  "ThemeInput": {
+    "enterThemes": "Temaları Girin",
+    "addThemesInstructions": "Oyun için temalar ekleyin.",
+    "hostInstructions": "Oda sahibi olarak, temaları kaldırabilir ve oyunu başlatabilirsiniz.",
+    "waitForHost": "Oda sahibi hazır olduğunda oyunu başlatacak.",
+    "enterTheme": "Bir tema girin",
+    "add": "Ekle",
+    "themePool": "Tema Havuzu",
+    "noThemesSubmitted": "Henüz tema gönderilmedi.",
+    "by": "yazan",
+    "startGame": "Oyunu Başlat",
+    "startingGame": "Oyun Başlatılıyor..."
+  },
+  "AnswerInput": {
+    "theme": "Tema:",
+    "enterAnswer": "Bu tema için cevabınızı girin",
+    "enterAnswerPlaceholder": "Cevabınızı girin",
+    "submitAnswer": "Cevabı Gönder",
+    "submitting": "Gönderiliyor...",
+    "answerSubmitted": "Cevap Gönderildi!",
+    "waitingForOthers": "Cevabınız kaydedildi. Lütfen diğer oyuncuların cevaplarını göndermesini bekleyin."
+  },
+  "GameProgress": {
+    "questions": "Sorular",
+    "playerScores": "Oyuncu Puanları"
+  },
+  "PlayerCard": {
+    "host": "Oda Sahibi",
+    "ready": "Hazır!"
+  },
+  "JoinForm": {
+    "joinTheGame": "Oyuna Katıl",
+    "enterNameToJoin": "Odaya katılmak için adınızı girin",
+    "enterYourName": "Adınızı girin",
+    "joining": "Katılınıyor...",
+    "joinGame": "Oyuna Katıl"
+  }
+}
+

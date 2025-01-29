@@ -1,13 +1,13 @@
 import RoomContent from "@/components/room-content"
 import JoinForm from "@/components/join-form"
 import { createClient } from "@/utils/supabase/server"
-import {getCurrentUser, signInAnonymously} from "@/lib/auth"
+import { getCurrentUser, signInAnonymously } from "@/lib/auth"
 import Script from "next/script"
-import { GameChannelProvider } from "@/contexts/GameChannelContext"
+import {GameChannelProvider} from "@/contexts/GameChannelContext";
 
 const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY
 
-export default async function RoomPage({ params }: { params: { id: string } }) {
+export default async function RoomPage({ params }: { params: { id: string; locale: string } }) {
     const supabase = await createClient()
 
     let user = await getCurrentUser()
@@ -41,7 +41,7 @@ export default async function RoomPage({ params }: { params: { id: string } }) {
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4">
-            <Script src={`https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`} />
+            <Script src={`https://www.google.com/recaptcha/api/js?render=${SITE_KEY}`} />
             <GameWrapper roomId={params.id}>
                 {isPlayerInRoom ? <RoomContent roomId={params.id} currentUserId={user.id} /> : <JoinForm roomId={params.id} />}
             </GameWrapper>
@@ -52,4 +52,3 @@ export default async function RoomPage({ params }: { params: { id: string } }) {
 const GameWrapper = ({ children, roomId }: { children: React.ReactNode; roomId: string }) => {
     return <GameChannelProvider roomId={roomId}>{children}</GameChannelProvider>
 }
-

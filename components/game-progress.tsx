@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import type { RoomState, Player } from "@/lib/types"
+import { useTranslations } from "next-intl"
 
 interface GameProgressProps {
     roomState: RoomState
@@ -11,6 +12,7 @@ interface GameProgressProps {
 
 export default function GameProgress({ roomState }: GameProgressProps) {
     const [progress, setProgress] = useState(0)
+    const t = useTranslations("GameProgress")
 
     useEffect(() => {
         const totalQuestions = roomState.themes.length
@@ -26,12 +28,12 @@ export default function GameProgress({ roomState }: GameProgressProps) {
             <CardContent className="p-4 space-y-4">
                 <div className="flex justify-between items-center mb-2">
                     <div className="text-sm font-medium text-indigo-600 whitespace-nowrap">
-                        Questions: {roomState.current_round + 1} / {roomState.themes.length}
+                        {t("questions")}: {roomState.current_round + 1} / {roomState.themes.length}
                     </div>
                 </div>
                 <Progress value={progress} className="w-full h-2" />
                 <div>
-                    <h3 className="text-sm font-semibold text-indigo-800 mb-2">Player Scores</h3>
+                    <h3 className="text-sm font-semibold text-indigo-800 mb-2">{t("playerScores")}</h3>
                     <div className="space-y-1">
                         {sortedPlayers.map((player: Player) => (
                             <div key={player.id} className="flex justify-between items-center text-sm">

@@ -1,27 +1,29 @@
 "use client"
 
-import {useState, useEffect} from "react"
-import {PlayerCard} from "@/components/player-card"
-import {Button} from "@/components/ui/button"
-import {startGame, resetGame} from "@/app/actions"
+import { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
+import { PlayerCard } from "@/components/player-card"
+import { Button } from "@/components/ui/button"
+import { startGame, resetGame } from "@/app/actions"
 import ThemeInput from "@/components/theme-input"
 import AnswerInput from "@/components/answer-input"
 import AnswerReviewScreen from "@/components/answer-review-screen"
 import GameResults from "@/components/game-results"
 import GameProgress from "@/components/game-progress"
-import {Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card"
-import {Copy, Check} from "lucide-react"
-import {useGameChannel} from "@/contexts/GameChannelContext"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Copy, Check } from "lucide-react"
+import { useGameChannel } from "@/contexts/GameChannelContext"
 
 interface RoomContentProps {
     roomId: string
     currentUserId: string
 }
 
-export default function RoomContent({roomId, currentUserId}: RoomContentProps) {
-    const {gameState} = useGameChannel()
+export default function RoomContent({ roomId, currentUserId }: RoomContentProps) {
+    const { gameState } = useGameChannel()
     const [isCopied, setIsCopied] = useState(false)
     const [isStartingGame, setIsStartingGame] = useState(false)
+    const t = useTranslations("RoomContent")
 
     const handleStartGame = async () => {
         if (isStartingGame) return
@@ -60,8 +62,7 @@ export default function RoomContent({roomId, currentUserId}: RoomContentProps) {
         return (
             <Card className="w-full">
                 <CardContent className="flex flex-col items-center space-y-4 p-6">
-                    <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">Loading game
-                        state...</CardTitle>
+                    <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">{t("loadingGameState")}</CardTitle>
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
                 </CardContent>
             </Card>
@@ -75,51 +76,43 @@ export default function RoomContent({roomId, currentUserId}: RoomContentProps) {
     const renderGameContent = () => {
         switch (gameState.game_state) {
             case "theme_input":
-                return <ThemeInput roomId={roomId}/>
+                return <ThemeInput roomId={roomId} />
             case "answer_input":
                 return currentTheme && !hasAnswered ? (
-                    <AnswerInput roomId={roomId} theme={currentTheme.question}/>
+                    <AnswerInput roomId={roomId} theme={currentTheme.question} />
                 ) : (
                     <Card className="w-full">
                         <CardContent className="flex flex-col items-center space-y-4 p-6">
-                            <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">Waiting for other
-                                players</CardTitle>
-                            <CardDescription className="text-center">
-                                You've submitted your answer. Please wait for other players to submit their answers.
-                            </CardDescription>
-                            <div
-                                className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+                            <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">
+                                {t("waitingForOtherPlayers")}
+                            </CardTitle>
+                            <CardDescription className="text-center">{t("answerSubmitted")}</CardDescription>
+                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
                         </CardContent>
                     </Card>
                 )
             case "review":
                 return currentTheme ? (
-                    <AnswerReviewScreen
-                        roomId={roomId}
-                        theme={currentTheme}
-                        isHost={isHost}
-                    />
+                    <AnswerReviewScreen roomId={roomId} theme={currentTheme} isHost={isHost} />
                 ) : (
                     <Card className="w-full">
                         <CardContent className="flex flex-col items-center space-y-4 p-6">
-                            <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">Review not
-                                available</CardTitle>
-                            <CardDescription className="text-center">Please wait for the game to
-                                progress.</CardDescription>
+                            <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">{t("reviewNotAvailable")}</CardTitle>
+                            <CardDescription className="text-center">{t("waitForGameProgress")}</CardDescription>
                         </CardContent>
                     </Card>
                 )
             case "game_over":
                 return (
                     <GameResults
-                        players={gameState.players.map((player) => {
-                            return {
+                        players={
+                            gameState.players.map((player) => ({
                                 id: player.id,
                                 name: player.name,
                                 avatar: player.avatar,
                                 score: player.score,
-                            }
-                        }) || []}
+                            })) || []
+                        }
                         themes={gameState.themes || []}
                         roomId={roomId}
                         isHost={isHost}
@@ -137,13 +130,13 @@ export default function RoomContent({roomId, currentUserId}: RoomContentProps) {
             >
                 <Card className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg">
                     <CardHeader className="space-y-2">
-                        <CardTitle className="text-2xl sm:text-3xl font-bold text-center text-indigo-800">Be the Odd
-                            One</CardTitle>
+                        <CardTitle className="text-2xl sm:text-3xl font-bold text-center text-indigo-800">
+                            {t("gameName")}
+                        </CardTitle>
                         {gameState.game_state === "waiting" && (
                             <div className="flex flex-col items-center space-y-2">
-                                <CardDescription
-                                    className="text-lg sm:text-xl text-center bg-amber-200 py-2 px-4 rounded-full inline-block">
-                                    Room ID: <span className="font-bold text-indigo-700">{roomId}</span>
+                                <CardDescription className="text-lg sm:text-xl text-center bg-amber-200 py-2 px-4 rounded-full inline-block">
+                                    {t("roomId")}: <span className="font-bold text-indigo-700">{roomId}</span>
                                 </CardDescription>
                                 <Button
                                     onClick={copyGameLink}
@@ -151,25 +144,24 @@ export default function RoomContent({roomId, currentUserId}: RoomContentProps) {
                                 >
                                     {isCopied ? (
                                         <>
-                                            <Check className="w-4 h-4 mr-2"/>
-                                            Copied!
+                                            <Check className="w-4 h-4 mr-2" />
+                                            {t("copied")}
                                         </>
                                     ) : (
                                         <>
-                                            <Copy className="w-4 h-4 mr-2"/>
-                                            Copy Game Link
+                                            <Copy className="w-4 h-4 mr-2" />
+                                            {t("copyGameLink")}
                                         </>
                                     )}
                                 </Button>
-                                <p className="text-sm text-gray-600 mt-2">Share this link with others to invite them to
-                                    the game!</p>
+                                <p className="text-sm text-gray-600 mt-2">{t("shareLink")}</p>
                             </div>
                         )}
                     </CardHeader>
                     <CardContent className="space-y-6">
                         {gameState.game_state === "waiting" ? (
                             <div className="space-y-4">
-                                <h2 className="text-xl sm:text-2xl text-indigo-800">Players:</h2>
+                                <h2 className="text-xl sm:text-2xl text-indigo-800">{t("players")}:</h2>
                                 <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
                                     {gameState.players.map((player, index) => (
                                         <PlayerCard
@@ -183,10 +175,7 @@ export default function RoomContent({roomId, currentUserId}: RoomContentProps) {
                                 </div>
                                 {gameState.players.length < 3 && (
                                     <div className="mt-4 p-4 bg-yellow-100 rounded-lg">
-                                        <p className="text-yellow-800 text-sm sm:text-base">
-                                            At least 3 players are required to start the game. Invite more players to
-                                            join!
-                                        </p>
+                                        <p className="text-yellow-800 text-sm sm:text-base">{t("needMorePlayers")}</p>
                                     </div>
                                 )}
                                 {isHost && gameState.players.length >= 3 && (
@@ -195,7 +184,7 @@ export default function RoomContent({roomId, currentUserId}: RoomContentProps) {
                                         disabled={isStartingGame}
                                         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200"
                                     >
-                                        {isStartingGame ? "Starting Game..." : "Start Game"}
+                                        {isStartingGame ? t("startingGame") : t("startGame")}
                                     </Button>
                                 )}
                                 {isHost && gameState.players.length < 3 && (
@@ -203,7 +192,7 @@ export default function RoomContent({roomId, currentUserId}: RoomContentProps) {
                                         disabled
                                         className="w-full bg-gray-400 text-white font-bold py-2 px-4 rounded-full text-lg cursor-not-allowed"
                                     >
-                                        Need at least 3 players to start
+                                        {t("needThreePlayers")}
                                     </Button>
                                 )}
                             </div>
@@ -217,7 +206,7 @@ export default function RoomContent({roomId, currentUserId}: RoomContentProps) {
                 gameState.game_state !== "theme_input" &&
                 gameState.game_state !== "game_over" && (
                     <div className="w-full md:w-1/4">
-                        <GameProgress roomState={gameState}/>
+                        <GameProgress roomState={gameState} />
                     </div>
                 )}
         </div>

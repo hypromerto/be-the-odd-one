@@ -1,4 +1,5 @@
 import Image from "next/image"
+import { useTranslations } from "next-intl"
 
 interface PlayerCardProps {
     name: string
@@ -8,6 +9,7 @@ interface PlayerCardProps {
 }
 
 export function PlayerCard({ name, avatar, isHost, ready }: PlayerCardProps) {
+    const t = useTranslations("PlayerCard")
     return (
         <div className="bg-white rounded-lg shadow-md p-3 flex items-center space-x-3 border-2 border-yellow-400 w-full mb-2">
             <div className="relative flex-shrink-0">
@@ -20,13 +22,13 @@ export function PlayerCard({ name, avatar, isHost, ready }: PlayerCardProps) {
                 />
                 {isHost && (
                     <span className="absolute -top-1 -right-1 bg-yellow-400 text-xs font-bold px-1 py-0.5 rounded-full">
-            Host
+            {t("host")}
           </span>
                 )}
             </div>
             <div className="flex-grow min-w-0 flex flex-col">
                 <h3 className="text-sm font-bold text-purple-700 truncate">{name}</h3>
-                {ready && <span className="text-xs text-green-500 font-semibold">Ready!</span>}
+                {ready && <span className="text-xs text-green-500 font-semibold">{t("ready")}</span>}
             </div>
         </div>
     )

@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button"
 import { markAnswerInvalid, finishReview } from "@/app/actions"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Info, Lightbulb, Users } from 'lucide-react'
+import { Info, Lightbulb, Users } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import {Theme} from "@/lib/types";
+import type { Theme } from "@/lib/types"
+import { useTranslations } from "next-intl"
 
 interface AnswerReviewScreenProps {
     roomId: string
@@ -18,6 +19,7 @@ interface AnswerReviewScreenProps {
 
 export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerReviewScreenProps) {
     const [isFinishingReview, setIsFinishingReview] = useState(false)
+    const t = useTranslations("AnswerReviewScreen")
 
     const handleMarkInvalid = async (answerId: string) => {
         if (!isHost) return
@@ -35,7 +37,6 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
             await finishReview(roomId, theme.id)
         } catch (error) {
             console.error("Failed to finish review:", error)
-        } finally {
             setIsFinishingReview(false)
         }
     }
@@ -50,13 +51,14 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
         return acc
     }, {})
 
-    const duplicateAnswers = Object.values(answerCounts).filter(players => players.length > 1).flat()
+    const duplicateAnswers = Object.values(answerCounts)
+        .filter((players) => players.length > 1)
+        .flat()
 
     // Identify players who won't earn points this round
     const playersWithoutPoints = theme.answers
-        .filter(answer => duplicateAnswers.includes(answer.id) || answer.invalid)
-        .map(answer => answer.player_name)
-
+        .filter((answer) => duplicateAnswers.includes(answer.id) || answer.invalid)
+        .map((answer) => answer.player_name)
 
     return (
         <motion.div
@@ -69,29 +71,25 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
             <Card className="w-full">
                 <CardHeader>
                     <CardTitle className="text-xl sm:text-2xl font-bold text-indigo-800">
-                        Answers for the theme: {theme.question}
+                        {t("answersForTheme")} {theme.question}
                     </CardTitle>
                     <CardDescription className="text-sm sm:text-base">
-                        Theme by: <span className="font-bold text-indigo-600">{theme.author.name}</span>
+                        {t("themeBy")} <span className="font-bold text-indigo-600">{theme.author.name}</span>
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {isHost && (
                         <Alert className="bg-amber-100 border-amber-200">
                             <Info className="h-4 w-4 text-amber-500" />
-                            <AlertTitle className="text-amber-700">Host Instructions</AlertTitle>
-                            <AlertDescription className="text-amber-600 text-sm">
-                                As the host, review the answers and mark any as invalid if they are irrelevant to the theme or essentially duplicate answers.
-                            </AlertDescription>
+                            <AlertTitle className="text-amber-700">{t("hostInstructions")}</AlertTitle>
+                            <AlertDescription className="text-amber-600 text-sm">{t("hostInstructionsText")}</AlertDescription>
                         </Alert>
                     )}
                     {playersWithoutPoints.length > 0 && (
                         <Alert className="bg-indigo-100 border-indigo-200">
                             <Users className="h-4 w-4 text-indigo-500" />
-                            <AlertTitle className="text-indigo-700">Players not earning points this round:</AlertTitle>
-                            <AlertDescription className="text-indigo-600 text-sm">
-                                {playersWithoutPoints.join(', ')}
-                            </AlertDescription>
+                            <AlertTitle className="text-indigo-700">{t("playersNotEarningPoints")}</AlertTitle>
+                            <AlertDescription className="text-indigo-600 text-sm">{playersWithoutPoints.join(", ")}</AlertDescription>
                         </Alert>
                     )}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -135,16 +133,14 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                                                                             <AlertTitle
                                                                                 className={`${isDuplicate ? "text-yellow-700" : "text-red-700"} text-sm font-semibold flex-grow`}
                                                                             >
-                                                                                {isDuplicate ? "Duplicate Answer" : "Invalid Answer"}
+                                                                                {isDuplicate ? t("duplicateAnswer") : t("invalidAnswer")}
                                                                             </AlertTitle>
                                                                         </div>
                                                                     </Alert>
                                                                 </TooltipTrigger>
                                                                 <TooltipContent side="top">
                                                                     <p className="text-xs max-w-xs">
-                                                                        {isDuplicate
-                                                                            ? "This answer matches with another player's. No points awarded."
-                                                                            : "The host has marked this answer as invalid for this round. No points will be awarded."}
+                                                                        {isDuplicate ? t("duplicateTooltip") : t("invalidTooltip")}
                                                                     </p>
                                                                 </TooltipContent>
                                                             </Tooltip>
@@ -155,7 +151,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                                                             onClick={() => handleMarkInvalid(answer.id)}
                                                             className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg transform hover:scale-105 transition-transform duration-200 text-sm"
                                                         >
-                                                            Mark as Invalid
+                                                            {t("markAsInvalid")}
                                                         </Button>
                                                     )}
                                                 </div>
@@ -172,14 +168,10 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
                             disabled={isFinishingReview}
                             className="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200 mt-6"
                         >
-                            {isFinishingReview ? "Finishing Review..." : "Finish Review"}
+                            {isFinishingReview ? t("finishingReview") : t("finishReview")}
                         </Button>
                     )}
-                    {!isHost && (
-                        <p className="text-base sm:text-lg text-indigo-600 font-bold mt-6">
-                            Waiting for the host to finish reviewing answers...
-                        </p>
-                    )}
+                    {!isHost && <p className="text-base sm:text-lg text-indigo-600 font-bold mt-6">{t("waitingForHost")}</p>}
                 </CardContent>
             </Card>
         </motion.div>

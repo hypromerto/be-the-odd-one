@@ -1,28 +1,30 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { createRoom, joinRoom } from "./actions"
+import { createRoom, joinRoom } from "../actions"
 import AnimatedContent from "@/components/animated-content"
 import { isRedirectError } from "next/dist/client/components/redirect"
-import Script from "next/script";
+import Script from "next/script"
+import { useTranslations } from "next-intl"
+import {useRouter} from "@/i18n/routing";
 
-const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY;
+const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY
 
 export default function HomePage() {
     const [isCreating, setIsCreating] = useState(false)
     const [isJoining, setIsJoining] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
+    const t = useTranslations("")
 
     const handleCreateRoom = async (formData: FormData) => {
         const playerName = formData.get("playerName") as string
         if (!playerName) {
-            setError("Please enter your name")
+            setError(t("enterNameError"))
             return
         }
         setIsCreating(true)
@@ -32,19 +34,19 @@ export default function HomePage() {
                 window.grecaptcha
                     .execute(SITE_KEY, { action: "submit" })
                     .then(async (token) => {
-                        /* send data to the server */
                         const { roomId } = await createRoom(token, playerName)
                         router.push(`/room/${roomId}`)
-                    }).catch((error) => {
+                    })
+                    .catch((error) => {
                         console.error("Failed to create room:", error)
-                        setError("Failed to create room. Please try again.")
+                        setError(t("createRoomError"))
                         setIsCreating(false)
                     })
             })
         } catch (error) {
             if (isRedirectError(error)) throw error
             console.error("Failed to create room:", error)
-            setError("Failed to create room. Please try again.")
+            setError(t("createRoomError"))
             setIsCreating(false)
         }
     }
@@ -53,7 +55,7 @@ export default function HomePage() {
         const playerName = formData.get("playerName") as string
         const roomId = formData.get("roomId") as string
         if (!playerName || !roomId) {
-            setError("Please enter both your name and the room ID")
+            setError(t("enterNameAndRoomError"))
             return
         }
         setIsJoining(true)
@@ -64,68 +66,61 @@ export default function HomePage() {
         } catch (error) {
             if (isRedirectError(error)) throw error
             console.error("Failed to join room:", error)
-            setError("Failed to join room. Please check the room ID and try again.")
+            setError(t("joinRoomError"))
             setIsJoining(false)
         }
     }
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
-            <Script
-                src={`https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`}
-            />
+            <Script src={`https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`} />
             <AnimatedContent>
                 <Card className="w-full backdrop-blur-sm bg-white/90 shadow-xl">
                     <CardHeader>
-                        <CardTitle className="text-3xl font-bold text-center text-indigo-800">Be the Odd One</CardTitle>
-                        <CardDescription className="text-center text-indigo-600">
-                            Stand out with your unique answers!
-                        </CardDescription>
+                        <CardTitle className="text-3xl font-bold text-center text-indigo-800">{t("gameName")}</CardTitle>
+                        <CardDescription className="text-center text-indigo-600">{t("gameDescription")}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-6">
                             <div className="space-y-2">
-                                <p className="text-sm text-gray-600">
-                                    Welcome to Be the Odd One, a game that challenges you to think differently and stand out from the
-                                    crowd! Here's how to play:
-                                </p>
+                                <p className="text-sm text-gray-600">{t("howToPlay")}</p>
                                 <div className="bg-amber-100 p-4 rounded-lg">
                                     <ol className="list-decimal list-inside text-sm text-gray-700 space-y-1">
-                                        <li>Players take turns submitting themes.</li>
-                                        <li>Everyone races to come up with unique answers for each theme.</li>
-                                        <li>Earn points by being the odd one out!</li>
-                                        <li>At least 3 players are required to start a game.</li>
+                                        <li>{t("howToPlaySteps.1")}</li>
+                                        <li>{t("howToPlaySteps.2")}</li>
+                                        <li>{t("howToPlaySteps.3")}</li>
+                                        <li>{t("howToPlaySteps.4")}</li>
                                     </ol>
                                 </div>
                             </div>
 
                             <Tabs defaultValue="create" className="w-full">
                                 <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger value="create">Create Room</TabsTrigger>
-                                    <TabsTrigger value="join">Join Room</TabsTrigger>
+                                    <TabsTrigger value="create">{t("createRoom")}</TabsTrigger>
+                                    <TabsTrigger value="join">{t("joinRoom")}</TabsTrigger>
                                 </TabsList>
                                 <TabsContent value="create">
                                     <form action={handleCreateRoom} className="space-y-4">
-                                        <Input type="text" name="playerName" placeholder="Enter your name" required />
+                                        <Input type="text" name="playerName" placeholder={t("enterName")} required />
                                         <Button
                                             type="submit"
                                             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
                                             disabled={isCreating}
                                         >
-                                            {isCreating ? "Creating..." : "Create Room"}
+                                            {isCreating ? t("creating") : t("createRoom")}
                                         </Button>
                                     </form>
                                 </TabsContent>
                                 <TabsContent value="join">
                                     <form action={handleJoinRoom} className="space-y-4">
-                                        <Input type="text" name="playerName" placeholder="Enter your name" required />
-                                        <Input type="text" name="roomId" placeholder="Enter room ID" required />
+                                        <Input type="text" name="playerName" placeholder={t("enterName")} required />
+                                        <Input type="text" name="roomId" placeholder={t("enterRoomId")} required />
                                         <Button
                                             type="submit"
                                             className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
                                             disabled={isJoining}
                                         >
-                                            {isJoining ? "Joining..." : "Join Room"}
+                                            {isJoining ? t("joining") : t("joinRoom")}
                                         </Button>
                                     </form>
                                 </TabsContent>

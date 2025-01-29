@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { submitAnswer } from "@/app/actions"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useGameChannel } from "@/contexts/GameChannelContext"
+import { useTranslations } from "next-intl"
 
 interface AnswerInputProps {
     roomId: string
@@ -19,6 +20,7 @@ export default function AnswerInput({ roomId, theme }: AnswerInputProps) {
     const [error, setError] = useState<string | null>(null)
     const [localIsSubmitted, setLocalIsSubmitted] = useState(false)
     const { gameState } = useGameChannel()
+    const t = useTranslations("AnswerInput")
 
     const currentPlayer = gameState?.players.find((player) => player.user_id === gameState.currentUserId) || null
     const isSubmitted = currentPlayer?.answer_ready || localIsSubmitted
@@ -57,10 +59,8 @@ export default function AnswerInput({ roomId, theme }: AnswerInputProps) {
             >
                 <Card className="w-full">
                     <CardContent className="flex flex-col items-center space-y-4 p-6">
-                        <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">Answer Submitted!</CardTitle>
-                        <CardDescription className="text-center">
-                            Your answer has been recorded. Please wait for other players to submit their answers.
-                        </CardDescription>
+                        <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">{t("answerSubmitted")}</CardTitle>
+                        <CardDescription className="text-center">{t("waitingForOthers")}</CardDescription>
                         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
                     </CardContent>
                 </Card>
@@ -78,8 +78,10 @@ export default function AnswerInput({ roomId, theme }: AnswerInputProps) {
         >
             <Card className="w-full">
                 <CardHeader>
-                    <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">Theme: {theme}</CardTitle>
-                    <CardDescription className="text-sm sm:text-base">Enter your answer for this theme</CardDescription>
+                    <CardTitle className="text-xl sm:text-2xl font-bold text-purple-700">
+                        {t("theme")} {theme}
+                    </CardTitle>
+                    <CardDescription className="text-sm sm:text-base">{t("enterAnswer")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -87,7 +89,7 @@ export default function AnswerInput({ roomId, theme }: AnswerInputProps) {
                             type="text"
                             value={answer}
                             onChange={(e) => setAnswer(e.target.value)}
-                            placeholder="Enter your answer"
+                            placeholder={t("enterAnswerPlaceholder")}
                             className="w-full border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                         />
                         <Button
@@ -95,7 +97,7 @@ export default function AnswerInput({ roomId, theme }: AnswerInputProps) {
                             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? "Submitting..." : "Submit Answer"}
+                            {isSubmitting ? t("submitting") : t("submitAnswer")}
                         </Button>
                     </form>
                     {error && <p className="text-red-500 text-sm mt-2">{error}</p>}

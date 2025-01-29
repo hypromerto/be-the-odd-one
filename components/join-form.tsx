@@ -8,6 +8,7 @@ import { joinRoom } from "@/app/actions"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { isRedirectError } from "next/dist/client/components/redirect"
 import Script from "next/script"
+import { useTranslations } from "next-intl"
 
 interface JoinFormProps {
     roomId: string
@@ -19,11 +20,12 @@ export default function JoinForm({ roomId }: JoinFormProps) {
     const [isJoining, setIsJoining] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
+    const t = useTranslations("JoinForm")
 
     const handleJoinRoom = async (formData: FormData) => {
         const playerName = formData.get("playerName") as string
         if (!playerName) {
-            setError("Please enter your name")
+            setError(t("enterNameError"))
             return
         }
         setIsJoining(true)
@@ -38,14 +40,14 @@ export default function JoinForm({ roomId }: JoinFormProps) {
                     })
                     .catch((error) => {
                         console.error("Failed to join room:", error)
-                        setError("Failed to join room. Please try again.")
+                        setError(t("joinRoomError"))
                         setIsJoining(false)
                     })
             })
         } catch (error) {
             if (isRedirectError(error)) throw error
             console.error("Failed to join room:", error)
-            setError("Failed to join room. Please try again.")
+            setError(t("joinRoomError"))
             setIsJoining(false)
         }
     }
@@ -55,14 +57,14 @@ export default function JoinForm({ roomId }: JoinFormProps) {
             <Script src={`https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`} />
             <Card className="w-full max-w-md mx-auto">
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-center text-indigo-800">Join the Game</CardTitle>
-                    <CardDescription className="text-center text-indigo-600">Enter your name to join the room</CardDescription>
+                    <CardTitle className="text-2xl font-bold text-center text-indigo-800">{t("joinTheGame")}</CardTitle>
+                    <CardDescription className="text-center text-indigo-600">{t("enterNameToJoin")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form action={handleJoinRoom} className="space-y-4">
-                        <Input type="text" name="playerName" placeholder="Enter your name" required />
+                        <Input type="text" name="playerName" placeholder={t("enterYourName")} required />
                         <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white" disabled={isJoining}>
-                            {isJoining ? "Joining..." : "Join Game"}
+                            {isJoining ? t("joining") : t("joinGame")}
                         </Button>
                     </form>
                     {error && <p className="text-red-500 text-center text-sm mt-2">{error}</p>}

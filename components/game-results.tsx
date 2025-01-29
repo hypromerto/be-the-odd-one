@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button"
 import confetti from "canvas-confetti"
 import { resetGame } from "@/app/actions"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import {PlayerScore, Theme} from "@/lib/types";
+import type { PlayerScore, Theme } from "@/lib/types"
+import { useTranslations } from "next-intl"
 
 interface GameResultsProps {
     players: PlayerScore[]
@@ -18,6 +19,7 @@ interface GameResultsProps {
 export default function GameResults({ players, themes, roomId, isHost }: GameResultsProps) {
     const [confettiTrigger, setConfettiTrigger] = useState(0)
     const [isResettingGame, setIsResettingGame] = useState(false)
+    const t = useTranslations("GameResults")
 
     useEffect(() => {
         if (confettiTrigger > 0) {
@@ -28,7 +30,6 @@ export default function GameResults({ players, themes, roomId, isHost }: GameRes
             })
         }
     }, [confettiTrigger])
-
 
     const sortedPlayers = [...players].sort((a, b) => b.score - a.score)
     const winner = sortedPlayers[0]
@@ -47,11 +48,13 @@ export default function GameResults({ players, themes, roomId, isHost }: GameRes
 
     return (
         <div className="flex flex-col items-center space-y-6 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-2xl mx-auto text-indigo-800">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4">Game Results</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4">{t("gameResults")}</h2>
 
             <Card className="w-full max-w-md bg-amber-100 rounded-lg shadow-xl p-4 sm:p-6">
                 <CardHeader>
-                    <CardTitle className="text-2xl sm:text-3xl font-bold text-purple-700 mb-4 text-center">Winner</CardTitle>
+                    <CardTitle className="text-2xl sm:text-3xl font-bold text-purple-700 mb-4 text-center">
+                        {t("winner")}
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="flex items-center justify-center space-x-4">
@@ -71,7 +74,7 @@ export default function GameResults({ players, themes, roomId, isHost }: GameRes
                         className="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full transition-colors duration-300"
                         onClick={() => setConfettiTrigger((prev) => prev + 1)}
                     >
-                        Celebrate!
+                        {t("celebrate")}
                     </Button>
                 </CardContent>
             </Card>
@@ -98,12 +101,14 @@ export default function GameResults({ players, themes, roomId, isHost }: GameRes
             </div>
 
             <div className="w-full mt-6">
-                <h3 className="text-xl sm:text-2xl font-bold mb-4">Theme Summary</h3>
+                <h3 className="text-xl sm:text-2xl font-bold mb-4">{t("themeSummary")}</h3>
                 {themes.map((theme) => (
                     <Card key={theme.id} className="bg-white rounded-lg shadow-md p-4 mb-4">
                         <CardHeader className="pb-2">
                             <CardTitle className="text-lg sm:text-xl font-semibold text-indigo-800">{theme.question}</CardTitle>
-                            <CardDescription className="text-sm text-indigo-600">by {theme.author.name}</CardDescription>
+                            <CardDescription className="text-sm text-indigo-600">
+                                {t("by")} {theme.author.name}
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <ul className="space-y-2">
@@ -130,14 +135,10 @@ export default function GameResults({ players, themes, roomId, isHost }: GameRes
                     disabled={isResettingGame}
                     className="mt-4 sm:mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 sm:py-3 px-4 sm:px-6 rounded-full text-lg sm:text-xl"
                 >
-                    {isResettingGame ? "Resetting Game..." : "Play Again"}
+                    {isResettingGame ? t("resettingGame") : t("playAgain")}
                 </Button>
             )}
-            {!isHost && (
-                <p className="text-lg sm:text-xl text-indigo-600 font-bold mt-4 sm:mt-6">
-                    Waiting for the host to start a new game...
-                </p>
-            )}
+            {!isHost && <p className="text-lg sm:text-xl text-indigo-600 font-bold mt-4 sm:mt-6">{t("waitingForHost")}</p>}
         </div>
     )
 }

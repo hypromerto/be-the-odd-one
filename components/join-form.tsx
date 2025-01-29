@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { joinRoom } from "@/app/actions"
@@ -9,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { isRedirectError } from "next/dist/client/components/redirect"
 import Script from "next/script"
 import { useTranslations } from "next-intl"
+import {useRouter} from "@/i18n/routing";
 
 interface JoinFormProps {
     roomId: string

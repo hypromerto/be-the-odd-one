@@ -383,8 +383,6 @@ export async function fetchRoomData(roomId: string): Promise<RoomState> {
         throw roomError
     }
 
-    console.log(room)
-
     // Transform the data to include player_name in answers
     const transformedRoom = {
         ...room,
@@ -396,8 +394,6 @@ export async function fetchRoomData(roomId: string): Promise<RoomState> {
             })),
         })),
     }
-
-    console.log("tr: ", transformedRoom)
 
     return transformedRoom as RoomState
 }

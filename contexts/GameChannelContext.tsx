@@ -52,7 +52,6 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
                     ...roomData,
                     currentUserId: user.id,
                 }))
-                console.log("Context user id", user.id)
             } catch (error) {
                 console.error("Error fetching initial game data:", error)
                 setGameState(null) // Set game state to null to indicate an error
@@ -254,19 +253,6 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
             }
         }
     }, [roomId, supabase]) // Added supabase to the dependency array
-
-    useEffect(() => {
-        if (gameState?.game_state === "answer_input") {
-            setGameState((prev): RoomState | null =>
-                prev
-                    ? {
-                        ...prev,
-                        players: prev.players.map((player) => ({ ...player, answer_ready: false })),
-                    }
-                    : null,
-            )
-        }
-    }, [gameState?.current_round, gameState?.game_state])
 
     return <GameChannelContext.Provider value={{ gameState, setGameState }}>{children}</GameChannelContext.Provider>
 }

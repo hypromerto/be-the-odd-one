@@ -4,17 +4,24 @@ import {createClient} from "@/utils/supabase/server"
 import {getCurrentUser, signInAnonymously} from "@/lib/auth"
 import {nanoid} from "nanoid"
 import type {RoomState, Theme, Answer, Player} from "@/lib/types"
+const SECRET_KEY = process.env.RECAPTCHA_SECRETKEY
+const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${SECRET_KEY}&response=`
 
-export async function createRoom(token: string, playerName: string) {
-    const SECRET_KEY = process.env.RECAPTCHA_SECRETKEY
-
-    const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${SECRET_KEY}&response=${token}`
-
+const verifyRecaptchaToken = async (token) => {
     try {
-        const recaptchaRes = await fetch(verifyUrl, {method: "POST"})
+        const tokenUrl = verifyUrl + token
+        const recaptchaRes = await fetch(tokenUrl, {method: "POST"})
 
         const recaptchaJson = await recaptchaRes.json()
     } catch (e) {
+        throw new Error("Captcha Failed")
+    }
+}
+
+export async function createRoom(token: string, playerName: string) {
+    const tokenErr = await verifyRecaptchaToken(token)
+
+    if (tokenErr) {
         throw new Error("Captcha Failed")
     }
 
@@ -67,7 +74,13 @@ export async function createRoom(token: string, playerName: string) {
     return {roomId, avatarKeyword}
 }
 
-export async function joinRoom(roomId: string, playerName: string) {
+export async function joinRoom(roomId: string, playerName: string, token: string) {
+    const tokenErr = await verifyRecaptchaToken(token)
+
+    if (tokenErr) {
+        throw new Error("Captcha Failed")
+    }
+
     const supabase = await createClient()
 
     let user = await getCurrentUser()

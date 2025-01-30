@@ -25,6 +25,8 @@ export default function AnswerInput({ roomId, theme }: AnswerInputProps) {
     const currentPlayer = gameState?.players.find((player) => player.user_id === gameState.currentUserId) || null
     const isSubmitted = currentPlayer?.answer_ready || localIsSubmitted
 
+    console.log("currentPlayer", currentPlayer)
+
     useEffect(() => {
         // Reset localIsSubmitted when the game state changes
         setLocalIsSubmitted(false)

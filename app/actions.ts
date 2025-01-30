@@ -193,8 +193,6 @@ export async function submitAnswer(roomId: string, playerId: number, answer: str
         throw new Error("Failed to fetch room data")
     }
 
-    console.log(room)
-
     const currentTheme = room.themes[room.current_round]
 
     const {data: answerData, error: answerError} = await supabase
@@ -480,8 +478,6 @@ export async function fetchFinalGameData(roomId: string) {
 
 export async function submitTheme(roomId: string, question: string, playerId: number) {
     const supabase = await createClient()
-    const user = await getCurrentUser()
-    if (!user) throw new Error("User not authenticated")
 
     const {data, error} = await supabase
         .from("themes")

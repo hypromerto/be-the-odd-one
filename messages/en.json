@@ -24,8 +24,6 @@
     "loadingGameState": "Loading...",
     "waitingForOtherPlayers": "Waiting for other players",
     "answerSubmitted": "You've submitted your answer. Please wait for other players to submit their answers.",
-    "reviewNotAvailable": "Review not available",
-    "waitForGameProgress": "Please wait for the game to progress.",
     "gameName": "Be the Odd One",
     "roomId": "Room ID",
     "copied": "Copied!",

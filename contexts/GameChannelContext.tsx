@@ -2,11 +2,11 @@
 
 import type React from "react"
 import { createContext, useContext, useEffect, useState, useRef } from "react"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import type { RealtimeChannel } from "@supabase/supabase-js"
 import type { RoomState} from "@/lib/types"
 import { fetchRoomData, fetchAnswersForTheme, fetchFinalGameData, fetchPlayers } from "@/app/actions"
 import { getCurrentUser, signInAnonymously } from "@/lib/client_auth"
+import {createClient} from "@/utils/supabase/client";
 
 interface GameChannelContextType {
     gameState: RoomState | null
@@ -30,7 +30,7 @@ interface GameChannelProviderProps {
 
 export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ children, roomId }) => {
     const [gameState, setGameState] = useState<RoomState | null>(null)
-    const supabase = createClientComponentClient()
+    const supabase = createClient()
     const channelRef = useRef<RealtimeChannel | null>(null)
 
     useEffect(() => {
@@ -52,6 +52,7 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
                     ...roomData,
                     currentUserId: user.id,
                 }))
+                console.log("Context user id", user.id)
             } catch (error) {
                 console.error("Error fetching initial game data:", error)
                 setGameState(null) // Set game state to null to indicate an error
@@ -71,16 +72,6 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
                         ? {
                             ...prev,
                             players: [...prev.players, payload.player],
-                        }
-                        : null,
-                )
-            })
-            .on("broadcast", { event: "themes_submitted" }, ({ payload }) => {
-                setGameState((prev): RoomState | null =>
-                    prev
-                        ? {
-                            ...prev,
-                            themes: [...prev.themes, ...payload.themes],
                         }
                         : null,
                 )
@@ -232,16 +223,6 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
                     console.error("Error fetching room data after game reset:", error)
                 }
             })
-            .on("broadcast", { event: "theme_added" }, ({ payload }) => {
-                setGameState((prev): RoomState | null =>
-                    prev
-                        ? {
-                            ...prev,
-                            themes: [...prev.themes, payload.theme],
-                        }
-                        : null,
-                )
-            })
             .on("broadcast", { event: "theme_removed" }, ({ payload }) => {
                 setGameState((prev): RoomState | null =>
                     prev
@@ -258,16 +239,6 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
                         ? {
                             ...prev,
                             themes: [...prev.themes, payload.theme],
-                        }
-                        : null,
-                )
-            })
-            .on("broadcast", { event: "theme_removed" }, ({ payload }) => {
-                setGameState((prev): RoomState | null =>
-                    prev
-                        ? {
-                            ...prev,
-                            themes: prev.themes.filter((theme) => theme.id !== payload.themeId),
                         }
                         : null,
                 )

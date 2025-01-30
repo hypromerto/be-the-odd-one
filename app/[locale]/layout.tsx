@@ -36,6 +36,7 @@ export default async function RootLayout({
             <Script src="https://www.google.com/recaptcha/api.js" async defer />
             <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9435164855607747" crossorigin="anonymous"></script>
             <GoogleAnalytics gaId="G-9XRSFJ4S84" />
+            <link rel="icon" href="/icon?<generated>" type="image/png" sizes="32x32" />
         </head>
         <body className={`${inter.className} bg-gradient-to-b from-amber-200 to-indigo-700 min-h-screen`}>
         <NextIntlClientProvider locale={locale} messages={messages}>

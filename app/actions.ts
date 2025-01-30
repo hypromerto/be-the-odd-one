@@ -37,11 +37,9 @@ export async function createRoom(token: string, playerName: string) {
     const roomId = nanoid(10)
     const avatarKeyword = ["cat", "dog", "rabbit", "fox", "koala", "panda", "lion"][Math.floor(Math.random() * 7)]
 
-    const {data: roomData, error: roomError} = await supabase
+    const {error: roomError} = await supabase
         .from("rooms")
         .insert({room_id: roomId, game_state: "waiting", current_round: 0})
-        .select()
-        .single()
 
     if (roomError) {
         console.error("Error creating room:", roomError)
@@ -162,12 +160,10 @@ export async function sendAllThemesSubmittedEvent(roomId: string) {
     if (!user) throw new Error("User not authenticated")
 
     // Update the game state to "answer_input"
-    const { data: updatedRoom, error: updateError } = await supabase
+    const { error: updateError } = await supabase
         .from("rooms")
         .update({ game_state: "answer_input", current_round: 0 })
         .eq("room_id", roomId)
-        .select()
-        .single()
 
     if (updateError) {
         console.error("Error updating game state:", updateError)
@@ -216,12 +212,10 @@ export async function submitAnswer(roomId: string, playerId: number, answer: str
         throw new Error("Failed to submit answer")
     }
 
-    const {data: playerUpdate, error: playerUpdateError} = await supabase
+    const {error: playerUpdateError} = await supabase
         .from("players")
         .update({answer_ready: true})
         .eq("id", playerId)
-        .select()
-        .single()
 
     if (playerUpdateError) {
         console.error("Error updating player answer_ready status:", playerUpdateError)
@@ -293,7 +287,7 @@ export async function finishReview(roomId: string, themeId: number) {
     const supabase = await createClient()
 
     // Call the finish_review_and_calculate_scores function with both parameters
-    const {data, error} = await supabase.rpc("finish_review_and_calculate_scores", {
+    const {error} = await supabase.rpc("finish_review_and_calculate_scores", {
         p_room_id: roomId,
         p_theme_id: themeId,
     })
@@ -416,33 +410,6 @@ export async function fetchPlayers(roomId: string): Promise<Player[]> {
     }
 
     return data as Player[]
-}
-
-export async function fetchAllThemes(roomId: string): Promise<Theme[]> {
-    const supabase = await createClient()
-
-    const {data: themes, error: themesError} = await supabase
-        .from("themes")
-        .select(`
-      id, 
-      question, 
-      author:players!themes_author_id_fkey(name),
-      answers(id, player_id, answer, invalid)
-    `)
-        .eq("room_id", roomId)
-        .order("id", {ascending: true})
-
-    if (themesError) {
-        console.error("Error fetching themes:", themesError)
-        throw new Error("Failed to fetch theme data")
-    }
-
-    return themes.map((theme) => ({
-        id: theme.id,
-        question: theme.question,
-        author: {name: theme.author.name},
-        answers: theme.answers || [],
-    }))
 }
 
 export async function fetchAnswersForTheme(roomId: string, themeId: number): Promise<Answer[]> {

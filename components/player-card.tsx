@@ -5,10 +5,9 @@ interface PlayerCardProps {
     name: string
     avatar: string
     isHost: boolean
-    ready: boolean
 }
 
-export function PlayerCard({ name, avatar, isHost, ready }: PlayerCardProps) {
+export function PlayerCard({ name, avatar, isHost }: PlayerCardProps) {
     const t = useTranslations("PlayerCard")
     return (
         <div className="bg-white rounded-lg shadow-md p-3 flex items-center space-x-3 border-2 border-yellow-400 w-full mb-2">
@@ -28,7 +27,6 @@ export function PlayerCard({ name, avatar, isHost, ready }: PlayerCardProps) {
             </div>
             <div className="flex-grow min-w-0 flex flex-col">
                 <h3 className="text-sm font-bold text-purple-700 truncate">{name}</h3>
-                {ready && <span className="text-xs text-green-500 font-semibold">{t("ready")}</span>}
             </div>
         </div>
     )

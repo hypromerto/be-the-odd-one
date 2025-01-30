@@ -92,8 +92,7 @@
     "playerNotReady": "Oyuncu hazır değil"
   },
   "PlayerCard": {
-    "host": "Oda Sahibi",
-    "ready": "Hazır!"
+    "host": "Oda Sahibi"
   },
   "JoinForm": {
     "joinTheGame": "Oyuna Katıl",

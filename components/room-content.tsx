@@ -170,7 +170,6 @@ export default function RoomContent({ roomId, currentUserId }: RoomContentProps)
                                             name={player.name}
                                             avatar={player.avatar}
                                             isHost={player.is_host}
-                                            ready={player.ready}
                                         />
                                     ))}
                                 </div>

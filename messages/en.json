@@ -92,8 +92,7 @@
     "playerNotReady": "Player not ready"
   },
   "PlayerCard": {
-    "host": "Host",
-    "ready": "Ready!"
+    "host": "Host"
   },
   "JoinForm": {
     "joinTheGame": "Join the Game",

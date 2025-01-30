@@ -161,6 +161,18 @@ export async function sendAllThemesSubmittedEvent(roomId: string) {
     const user = await getCurrentUser()
     if (!user) throw new Error("User not authenticated")
 
+    // Update the game state to "answer_input"
+    const { data: updatedRoom, error: updateError } = await supabase
+        .from("rooms")
+        .update({ game_state: "answer_input", current_round: 0 })
+        .eq("room_id", roomId)
+        .select()
+        .single()
+
+    if (updateError) {
+        console.error("Error updating game state:", updateError)
+        throw new Error("Failed to update game state")
+    }
 
     await supabase.channel(`room:${roomId}`).send({
         type: "broadcast",

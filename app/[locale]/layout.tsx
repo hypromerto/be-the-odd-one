@@ -33,7 +33,7 @@ export default async function RootLayout({
         <head>
             <title>Be the Odd One</title>
             <Script src="https://www.google.com/recaptcha/api.js" async defer />
-            <GoogleAdsense pId={AdsenseId} />
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9435164855607747" crossorigin="anonymous"></script>
         </head>
         <body className={`${inter.className} bg-gradient-to-b from-amber-200 to-indigo-700 min-h-screen`}>
         <NextIntlClientProvider locale={locale} messages={messages}>

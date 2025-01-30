@@ -8,6 +8,7 @@ import {routing} from "@/i18n/routing";
 import {getMessages} from "next-intl/server";
 import GoogleAdsense from "@/components/GoogleAdsense";
 import Script from "next/script";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 const inter = Inter({subsets: ["latin"]})
 const AdsenseId = process.env.NEXT_PUBLIC_ADSENSE_ID
@@ -34,6 +35,7 @@ export default async function RootLayout({
             <title>Be the Odd One</title>
             <Script src="https://www.google.com/recaptcha/api.js" async defer />
             <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9435164855607747" crossorigin="anonymous"></script>
+            <GoogleAnalytics gaId="G-9XRSFJ4S84" />
         </head>
         <body className={`${inter.className} bg-gradient-to-b from-amber-200 to-indigo-700 min-h-screen`}>
         <NextIntlClientProvider locale={locale} messages={messages}>

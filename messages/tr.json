@@ -87,7 +87,9 @@
   },
   "GameProgress": {
     "questions": "Sorular",
-    "playerScores": "Oyuncu Puanları"
+    "playerScores": "Oyuncu Puanları",
+    "playerReady": "Oyuncu hazır",
+    "playerNotReady": "Oyuncu hazır değil"
   },
   "PlayerCard": {
     "host": "Oda Sahibi",

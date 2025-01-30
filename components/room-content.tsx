@@ -35,6 +35,7 @@ export default function RoomContent({ roomId, currentUserId }: RoomContentProps)
             console.error("Failed to start game:", error)
             setIsStartingGame(false)
         }
+        setIsStartingGame(false)
     }
 
     const handleResetGame = async () => {

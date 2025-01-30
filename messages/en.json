@@ -87,7 +87,9 @@
   },
   "GameProgress": {
     "questions": "Questions",
-    "playerScores": "Player Scores"
+    "playerScores": "Player Scores",
+    "playerReady": "Player ready",
+    "playerNotReady": "Player not ready"
   },
   "PlayerCard": {
     "host": "Host",

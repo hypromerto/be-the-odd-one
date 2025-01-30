@@ -7,7 +7,6 @@ export interface Player {
     name: string
     avatar: string
     is_host: boolean
-    theme_ready: boolean
     answer_ready: boolean
     score: number
 }

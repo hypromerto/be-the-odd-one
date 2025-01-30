@@ -340,7 +340,6 @@ export async function fetchRoomData(roomId: string): Promise<RoomState> {
         name,
         avatar,
         is_host,
-        theme_ready,
         answer_ready,
         score
       ),

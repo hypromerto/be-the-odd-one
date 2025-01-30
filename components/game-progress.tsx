@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import type { RoomState, Player } from "@/lib/types"
 import { useTranslations } from "next-intl"
+import { Check, Loader2 } from "lucide-react"
 
 interface GameProgressProps {
     roomState: RoomState
@@ -37,7 +38,14 @@ export default function GameProgress({ roomState }: GameProgressProps) {
                     <div className="space-y-1">
                         {sortedPlayers.map((player: Player) => (
                             <div key={player.id} className="flex justify-between items-center text-sm">
-                                <span className="font-medium text-indigo-600 truncate max-w-[70%]">{player.name}</span>
+                                <div className="flex items-center space-x-2">
+                                    {player.answer_ready ? (
+                                        <Check className="h-4 w-4 text-green-500" aria-label={t("playerReady")} />
+                                    ) : (
+                                        <Loader2 className="h-4 w-4 text-amber-500 animate-spin" aria-label={t("playerNotReady")} />
+                                    )}
+                                    <span className="font-medium text-indigo-600 truncate max-w-[60%]">{player.name}</span>
+                                </div>
                                 <span className="font-bold text-indigo-800">{player.score || 0}</span>
                             </div>
                         ))}

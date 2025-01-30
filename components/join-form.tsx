@@ -17,17 +17,22 @@ interface JoinFormProps {
 const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY
 
 export default function JoinForm({ roomId }: JoinFormProps) {
+    const [joiningName, setJoiningName] = useState('')
     const [isJoining, setIsJoining] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
     const t = useTranslations("JoinForm")
 
-    const handleJoinRoom = async (formData: FormData) => {
-        const playerName = formData.get("playerName") as string
-        if (!playerName) {
-            setError(t("enterNameError"))
+    const handleJoinGame = async () => {
+        if (!joiningName) {
+            setError('Please enter your name')
             return
         }
+
+        if (isJoining) {
+            return
+        }
+
         setIsJoining(true)
         setError(null)
         try {
@@ -35,19 +40,17 @@ export default function JoinForm({ roomId }: JoinFormProps) {
                 window.grecaptcha
                     .execute(SITE_KEY, { action: "submit" })
                     .then(async (token) => {
-                        await joinRoom(roomId, playerName)
+                        /* send data to the server */
+                        await joinRoom(roomId, joiningName)
                         router.refresh()
-                    })
-                    .catch((error) => {
-                        console.error("Failed to join room:", error)
-                        setError(t("joinRoomError"))
-                        setIsJoining(false)
-                    })
+                    }).catch((error) => {
+                    console.error("Failed to join game:", error)
+                    setError("Failed to join game. Please try again.")
+                })
             })
         } catch (error) {
-            if (isRedirectError(error)) throw error
-            console.error("Failed to join room:", error)
-            setError(t("joinRoomError"))
+            console.error('Failed to join game:', error)
+            setError('Failed to join game. Please try again.')
             setIsJoining(false)
         }
     }
@@ -57,17 +60,19 @@ export default function JoinForm({ roomId }: JoinFormProps) {
             <Script src={`https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`} />
             <Card className="w-full max-w-md mx-auto">
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold text-center text-indigo-800">{t("joinTheGame")}</CardTitle>
-                    <CardDescription className="text-center text-indigo-600">{t("enterNameToJoin")}</CardDescription>
+                    <CardTitle className="text-xl sm:text-2xl text-indigo-800">Join the Game</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <form action={handleJoinRoom} className="space-y-4">
-                        <Input type="text" name="playerName" placeholder={t("enterYourName")} required />
-                        <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white" disabled={isJoining}>
-                            {isJoining ? t("joining") : t("joinGame")}
-                        </Button>
-                    </form>
-                    {error && <p className="text-red-500 text-center text-sm mt-2">{error}</p>}
+                <CardContent className="space-y-4">
+                    <Input
+                        type="text"
+                        placeholder="Enter your name"
+                        value={joiningName}
+                        onChange={(e) => setJoiningName(e.target.value)}
+                    />
+                    <Button onClick={handleJoinGame} disabled={isJoining} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white">
+                        {isJoining ? 'Joining...' : 'Join Game'}
+                    </Button>
+                    {error && <p className="text-red-500 text-sm">{error}</p>}
                 </CardContent>
             </Card>
         </>

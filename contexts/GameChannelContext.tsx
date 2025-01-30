@@ -4,8 +4,8 @@ import type React from "react"
 import { createContext, useContext, useEffect, useState, useRef } from "react"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import type { RealtimeChannel } from "@supabase/supabase-js"
-import type { RoomState, Theme, Answer, Player } from "@/lib/types"
-import { fetchRoomData, fetchAllThemes, fetchAnswersForTheme, fetchFinalGameData, fetchPlayers } from "@/app/actions"
+import type { RoomState} from "@/lib/types"
+import { fetchRoomData, fetchAnswersForTheme, fetchFinalGameData, fetchPlayers } from "@/app/actions"
 import { getCurrentUser, signInAnonymously } from "@/lib/client_auth"
 
 interface GameChannelContextType {
@@ -221,7 +221,6 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
                             ...roomData,
                             players: roomData.players.map((player) => ({
                                 ...player,
-                                theme_ready: false,
                                 answer_ready: false,
                                 score: 0,
                             })),

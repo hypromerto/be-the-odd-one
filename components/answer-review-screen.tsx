@@ -43,11 +43,11 @@ export default function AnswerReviewScreen({ roomId, theme, isHost }: AnswerRevi
 
     // Identify duplicate answers
     const answerCounts = theme.answers.reduce((acc: Record<string, string[]>, answer) => {
-        const lowerCaseAnswer = answer.answer.toLowerCase()
-        if (!acc[lowerCaseAnswer]) {
-            acc[lowerCaseAnswer] = []
+        const trimmedLowerCaseAnswer = answer.answer.trim().toLowerCase()
+        if (!acc[trimmedLowerCaseAnswer]) {
+            acc[trimmedLowerCaseAnswer] = []
         }
-        acc[lowerCaseAnswer].push(answer.id)
+        acc[trimmedLowerCaseAnswer].push(answer.id)
         return acc
     }, {})
 

@@ -5,7 +5,7 @@ import * as React from "react"
 import type { ToastActionElement, ToastProps } from "@/components/ui/toast"
 
 const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 3000
 
 type ToasterToast = ToastProps & {
     id: string
@@ -134,10 +134,10 @@ function dispatch(action: Action) {
 
 type Toast = Omit<ToasterToast, "id">
 
-function toast({ ...props }: Toast) {
-    const id = genId()
+function toast(props: ToastProps) {
+    const id = props.id || genId()
 
-    const update = (props: ToasterToast) =>
+    const update = (props: ToastProps) =>
         dispatch({
             type: "UPDATE_TOAST",
             toast: { ...props, id },
@@ -155,6 +155,9 @@ function toast({ ...props }: Toast) {
             },
         },
     })
+
+    // Automatically dismiss the toast after 3 seconds
+    setTimeout(dismiss, 3000)
 
     return {
         id: id,
@@ -174,7 +177,7 @@ function useToast() {
                 listeners.splice(index, 1)
             }
         }
-    }, []) // Removed unnecessary dependency: [state]
+    }, [])
 
     return {
         ...state,

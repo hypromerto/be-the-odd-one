@@ -9,6 +9,7 @@ import type { PlayerScore, Theme } from "@/lib/types"
 import { useTranslations } from "next-intl"
 import { useResetGame } from "@/contexts/GameChannelContext"
 import { Trophy, Medal } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface GameResultsProps {
     players: PlayerScore[]
@@ -144,49 +145,61 @@ export default function GameResults({
                 {showThemeSummary ? t("hideThemeSummary") : t("showThemeSummary")}
             </Button>
 
-            {showThemeSummary && (
-                <div className="w-full mt-6">
-                    <h3 className="text-xl sm:text-2xl font-bold mb-4">{t("themeSummary")}</h3>
-                    {themes.map((theme) => (
-                        <Card key={theme.id} className="bg-white rounded-lg shadow-md p-4 mb-4">
-                            <CardHeader className="pb-2">
-                                <CardTitle className="text-lg sm:text-xl font-semibold text-indigo-800">{theme.question}</CardTitle>
-                                {themeSource === "custom" && (
-                                    <CardDescription className="text-sm text-indigo-600">
-                                        {t("by")} {theme.author.name}
-                                    </CardDescription>
-                                )}
-                            </CardHeader>
-                            <CardContent>
-                                <ul className="space-y-2">
-                                    {theme.answers.map((answer) => (
-                                        <li
-                                            key={answer.id}
-                                            className="text-sm sm:text-base flex justify-between items-center py-1 border-b border-gray-100 last:border-b-0"
-                                        >
-                                            <span className="font-semibold text-indigo-700 mr-2">{answer.player_name}:</span>
-                                            <span className={`flex-1 ${!answer.invalid ? "text-green-600 font-medium" : "text-gray-600"}`}>
-                        {answer.answer}
-                      </span>
-                                            <span className="text-indigo-600 font-medium">
-                        {isTimedMode
-                            ? answer.points === 2
-                                ? "+2 pts (First)"
-                                : answer.points === 1
+            <AnimatePresence>
+                {showThemeSummary && (
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="w-full overflow-hidden"
+                    >
+                        <div className="w-full mt-6">
+                            <h3 className="text-xl sm:text-2xl font-bold mb-4">{t("themeSummary")}</h3>
+                            {themes.map((theme) => (
+                                <Card key={theme.id} className="bg-white rounded-lg shadow-md p-4 mb-4">
+                                    <CardHeader className="pb-2">
+                                        <CardTitle className="text-lg sm:text-xl font-semibold text-indigo-800">{theme.question}</CardTitle>
+                                        {themeSource === "custom" && (
+                                            <CardDescription className="text-sm text-indigo-600">
+                                                {t("by")} {theme.author.name}
+                                            </CardDescription>
+                                        )}
+                                    </CardHeader>
+                                    <CardContent>
+                                        <ul className="space-y-2">
+                                            {theme.answers.map((answer) => (
+                                                <li
+                                                    key={answer.id}
+                                                    className="text-sm sm:text-base flex justify-between items-center py-1 border-b border-gray-100 last:border-b-0"
+                                                >
+                                                    <span className="font-semibold text-indigo-700 mr-2">{answer.player_name}:</span>
+                                                    <span
+                                                        className={`flex-1 ${!answer.invalid ? "text-green-600 font-medium" : "text-gray-600"}`}
+                                                    >
+                            {answer.answer}
+                          </span>
+                                                    <span className="text-indigo-600 font-medium">
+                            {isTimedMode
+                                ? answer.points === 2
+                                    ? "+2 pts (First)"
+                                    : answer.points === 1
+                                        ? "+1 pt"
+                                        : "0 pts"
+                                : answer.points > 0
                                     ? "+1 pt"
-                                    : "0 pts"
-                            : answer.points > 0
-                                ? "+1 pt"
-                                : "0 pts"}
-                      </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
-            )}
+                                    : "0 pts"}
+                          </span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {isHost && (
                 <Button

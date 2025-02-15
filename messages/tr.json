@@ -50,7 +50,10 @@
     "by": "yazan",
     "playAgain": "Tekrar Oyna",
     "resettingGame": "Oyun Sıfırlanıyor...",
-    "waitingForHost": "Oda sahibinin yeni bir oyun başlatmasını bekliyoruz..."
+    "waitingForHost": "Oda sahibinin yeni bir oyun başlatmasını bekliyoruz...",
+    "points": "Puan",
+    "showThemeSummary": "Tema Özetini Göster",
+    "hideThemeSummary": "Tema Özetini Gizle"
   },
   "AnswerReviewScreen": {
     "answersForTheme": "Tema için cevaplar:",

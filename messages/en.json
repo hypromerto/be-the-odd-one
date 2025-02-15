@@ -47,7 +47,10 @@
     "by": "by",
     "playAgain": "Play Again",
     "resettingGame": "Resetting Game...",
-    "waitingForHost": "Waiting for the host to start a new game..."
+    "waitingForHost": "Waiting for the host to start a new game...",
+    "points": "Points",
+    "showThemeSummary": "Show Theme Summary",
+    "hideThemeSummary": "Hide Theme Summary"
   },
   "AnswerReviewScreen": {
     "answersForTheme": "Answers for the theme:",

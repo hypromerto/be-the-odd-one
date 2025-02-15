@@ -31,6 +31,7 @@ export default function GameResults({
                                     }: GameResultsProps) {
     const [confettiTrigger, setConfettiTrigger] = useState(0)
     const [isResettingGame, setIsResettingGame] = useState(false)
+    const [showThemeSummary, setShowThemeSummary] = useState(false)
     const t = useTranslations("GameResults")
     const resetGame = useResetGame(roomId)
 
@@ -44,7 +45,7 @@ export default function GameResults({
         }
     }, [confettiTrigger])
 
-    const sortedPlayers = [...players].sort((a, b) => b.score - a.score)
+    const sortedPlayers = players.sort((a, b) => b.score - a.score)
     const topPlayers = sortedPlayers.slice(0, 3)
 
     const handlePlayAgain = async () => {
@@ -82,7 +83,9 @@ export default function GameResults({
                             </div>
                             <div className="text-center mb-2">
                                 <p className="font-bold text-indigo-700">{player.name}</p>
-                                <p className="text-indigo-600">{player.score} pts</p>
+                                <p className="text-indigo-600">
+                                    {player.score} {t("points")}
+                                </p>
                             </div>
                             <div className={`w-24 ${podiumHeight} bg-indigo-600 rounded-t-lg flex items-center justify-center`}>
                                 {isWinner ? (
@@ -124,7 +127,9 @@ export default function GameResults({
                             />
                             <div className="flex-grow min-w-0">
                                 <p className="text-base font-semibold text-indigo-700 truncate">{player.name}</p>
-                                <p className="text-sm text-indigo-600">{player.score} points</p>
+                                <p className="text-sm text-indigo-600">
+                                    {player.score} {t("points")}
+                                </p>
                             </div>
                         </div>
                         <div className="text-xl font-bold text-indigo-700 ml-2">#{index + 4}</div>
@@ -132,47 +137,56 @@ export default function GameResults({
                 ))}
             </div>
 
-            <div className="w-full mt-6">
-                <h3 className="text-xl sm:text-2xl font-bold mb-4">{t("themeSummary")}</h3>
-                {themes.map((theme) => (
-                    <Card key={theme.id} className="bg-white rounded-lg shadow-md p-4 mb-4">
-                        <CardHeader className="pb-2">
-                            <CardTitle className="text-lg sm:text-xl font-semibold text-indigo-800">{theme.question}</CardTitle>
-                            {themeSource === "custom" && (
-                                <CardDescription className="text-sm text-indigo-600">
-                                    {t("by")} {theme.author.name}
-                                </CardDescription>
-                            )}
-                        </CardHeader>
-                        <CardContent>
-                            <ul className="space-y-2">
-                                {theme.answers.map((answer) => (
-                                    <li
-                                        key={answer.id}
-                                        className="text-sm sm:text-base flex justify-between items-center py-1 border-b border-gray-100 last:border-b-0"
-                                    >
-                                        <span className="font-semibold text-indigo-700 mr-2">{answer.player_name}:</span>
-                                        <span className={`flex-1 ${!answer.invalid ? "text-green-600 font-medium" : "text-gray-600"}`}>
-                      {answer.answer}
-                    </span>
-                                        <span className="text-indigo-600 font-medium">
-                      {isTimedMode
-                          ? answer.points === 2
-                              ? "+2 pts (First)"
-                              : answer.points === 1
-                                  ? "+1 pt"
-                                  : "0 pts"
-                          : answer.points > 0
-                              ? "+1 pt"
-                              : "0 pts"}
-                    </span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
+            <Button
+                className="w-full bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-bold py-3 px-6 rounded-full transition-colors duration-300 text-lg"
+                onClick={() => setShowThemeSummary(!showThemeSummary)}
+            >
+                {showThemeSummary ? t("hideThemeSummary") : t("showThemeSummary")}
+            </Button>
+
+            {showThemeSummary && (
+                <div className="w-full mt-6">
+                    <h3 className="text-xl sm:text-2xl font-bold mb-4">{t("themeSummary")}</h3>
+                    {themes.map((theme) => (
+                        <Card key={theme.id} className="bg-white rounded-lg shadow-md p-4 mb-4">
+                            <CardHeader className="pb-2">
+                                <CardTitle className="text-lg sm:text-xl font-semibold text-indigo-800">{theme.question}</CardTitle>
+                                {themeSource === "custom" && (
+                                    <CardDescription className="text-sm text-indigo-600">
+                                        {t("by")} {theme.author.name}
+                                    </CardDescription>
+                                )}
+                            </CardHeader>
+                            <CardContent>
+                                <ul className="space-y-2">
+                                    {theme.answers.map((answer) => (
+                                        <li
+                                            key={answer.id}
+                                            className="text-sm sm:text-base flex justify-between items-center py-1 border-b border-gray-100 last:border-b-0"
+                                        >
+                                            <span className="font-semibold text-indigo-700 mr-2">{answer.player_name}:</span>
+                                            <span className={`flex-1 ${!answer.invalid ? "text-green-600 font-medium" : "text-gray-600"}`}>
+                        {answer.answer}
+                      </span>
+                                            <span className="text-indigo-600 font-medium">
+                        {isTimedMode
+                            ? answer.points === 2
+                                ? "+2 pts (First)"
+                                : answer.points === 1
+                                    ? "+1 pt"
+                                    : "0 pts"
+                            : answer.points > 0
+                                ? "+1 pt"
+                                : "0 pts"}
+                      </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
 
             {isHost && (
                 <Button

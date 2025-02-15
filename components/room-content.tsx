@@ -1,14 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { motion, AnimatePresence } from "framer-motion"
 import ThemeInput from "@/components/theme-input"
 import AnswerInput from "@/components/answer-input"
 import AnswerReviewScreen from "@/components/answer-review-screen"
 import GameResults from "@/components/game-results"
 import GameProgress from "@/components/game-progress"
-import FirstAnswerDisplay from "@/components/FirstAnswerDisplay"
 import { Card, CardContent, CardTitle } from "@/components/ui/card"
 import { useGameChannel, useStartGame, useResetGame } from "@/contexts/GameChannelContext"
 import Lobby from "@/components/Lobby"
@@ -22,8 +20,6 @@ interface RoomContentProps {
 export default function RoomContent({ roomId, currentUserId }: RoomContentProps) {
     const { state: gameState } = useGameChannel()
     const [isStartingGame, setIsStartingGame] = useState(false)
-    const [showFirstAnswerDisplay, setShowFirstAnswerDisplay] = useState(false)
-    const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false)
     const t = useTranslations("RoomContent")
     const startGame = useStartGame(roomId)
     const resetGame = useResetGame(roomId)
@@ -36,16 +32,6 @@ export default function RoomContent({ roomId, currentUserId }: RoomContentProps)
         currentTheme = gameState?.themes[gameState?.current_round] || null
     }
     const currentPlayer = gameState?.players?.find((player) => player.user_id === currentUserId) || null
-
-    useEffect(() => {
-        if (gameState?.timer_started) {
-            setShowFirstAnswerDisplay(true)
-            const timer = setTimeout(() => {
-                setShowFirstAnswerDisplay(false)
-            }, 3000)
-            return () => clearTimeout(timer)
-        }
-    }, [gameState?.timer_started])
 
     const handleStartGame = async () => {
         if (isStartingGame) return
@@ -71,10 +57,6 @@ export default function RoomContent({ roomId, currentUserId }: RoomContentProps)
         } catch (error) {
             console.error("Failed to reset game:", error)
         }
-    }
-
-    const handleAnswerSubmitStateChange = (isSubmitted: boolean) => {
-        setIsAnswerSubmitted(isSubmitted)
     }
 
     if (gameState.game_state === "loading") {
@@ -109,7 +91,6 @@ export default function RoomContent({ roomId, currentUserId }: RoomContentProps)
                             roomId={roomId}
                             theme={currentTheme}
                             currentPlayer={currentPlayer}
-                            onSubmitStateChange={handleAnswerSubmitStateChange}
                         />
                     )
                 )
@@ -134,25 +115,6 @@ export default function RoomContent({ roomId, currentUserId }: RoomContentProps)
 
     return (
         <div className="w-full max-w-2xl mx-auto space-y-4 relative">
-            <div className="h-16 relative">
-                <AnimatePresence>
-                    {gameState.is_timed_mode && showFirstAnswerDisplay && !isAnswerSubmitted && (
-                        <motion.div
-                            className="absolute w-full"
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            transition={{ duration: 0.3 }}
-                        >
-                            <FirstAnswerDisplay
-                                playerName={
-                                    gameState?.players.find((p) => p.id === gameState?.first_submit_player_id)?.name || t("someoneElse")
-                                }
-                            />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
             {gameState.game_state !== "waiting" && gameState.game_state !== "game_over" && gameState.game_state !== "theme_input" && (
                 <GameProgress roomState={gameState} />
             )}

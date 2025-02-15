@@ -92,7 +92,9 @@
     "submitAnswer": "Cevabı Gönder",
     "submitting": "Gönderiliyor...",
     "answerSubmitted": "Cevap Gönderildi!",
-    "waitingForOthers": "Cevabınız kaydedildi. Lütfen diğer oyuncuların cevaplarını göndermesini bekleyin."
+    "waitingForOthers": "Cevabınız kaydedildi. Lütfen diğer oyuncuların cevaplarını göndermesini bekleyin.",
+    "playerAnswered": "{playerName} cevap verdi!",
+    "timeRemaining": "Cevap vermek için 10 saniyeniz var!"
   },
   "GameProgress": {
     "questions": "Sorular",
@@ -133,11 +135,6 @@
     "scoreboardTitle": "Skor Tablosu",
     "score": "Puan",
     "leader": "Lider"
-  },
-  "FirstAnswerDisplay": {
-    "playerAnswered": "{playerName} cevap verdi!",
-    "timeRemaining": "Cevap vermek için 10 saniyeniz var!",
-    "someoneElse": "Birisi"
   }
 }
 

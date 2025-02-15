@@ -89,7 +89,9 @@
     "submitAnswer": "Submit Answer",
     "submitting": "Submitting...",
     "answerSubmitted": "Answer Submitted!",
-    "waitingForOthers": "Your answer has been recorded. Please wait for other players to submit their answers."
+    "waitingForOthers": "Your answer has been recorded. Please wait for other players to submit their answers.",
+    "playerAnswered": "{playerName} has answered!",
+    "timeRemaining": "You have 10 seconds to answer!"
   },
   "GameProgress": {
     "questions": "Questions",
@@ -133,11 +135,6 @@
     "scoreboardTitle": "Scoreboard",
     "score": "Score",
     "leader": "Leader"
-  },
-  "FirstAnswerDisplay": {
-    "playerAnswered": "{playerName} has answered!",
-    "timeRemaining": "You have 10 seconds to answer!",
-    "someoneElse": "Someone"
   }
 }
 

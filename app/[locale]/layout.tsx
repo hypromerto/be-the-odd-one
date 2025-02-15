@@ -9,6 +9,7 @@ import {getMessages} from "next-intl/server";
 import GoogleAdsense from "@/components/GoogleAdsense";
 import Script from "next/script";
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { Toaster } from "@/components/ui/toaster"
 
 const inter = Inter({subsets: ["latin"]})
 const AdsenseId = process.env.NEXT_PUBLIC_ADSENSE_ID
@@ -44,6 +45,7 @@ export default async function RootLayout({
                 <LanguageSwitcher/>
             </header>
             {children}
+            <Toaster />
         </NextIntlClientProvider>
         </body>
         </html>

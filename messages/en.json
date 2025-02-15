@@ -15,6 +15,7 @@
   "creating": "Creating...",
   "joining": "Joining...",
   "LanguageSwitcher": {
+    "switchLanguage": "Switch language",
     "switchToEnglish": "Switch to English",
     "switchToTurkish": "Türkçe'ye geç"
   },
@@ -33,7 +34,10 @@
     "needMorePlayers": "At least 3 players are required to start the game. Invite more players to join!",
     "startingGame": "Starting Game...",
     "startGame": "Start Game",
-    "needThreePlayers": "Need at least 3 players to start"
+    "needThreePlayers": "Need at least 3 players to start",
+    "waitingForGameToStart": "Waiting for the game to start",
+    "themePackSelected": "Theme pack has been selected",
+    "gameSettings": "Game Settings"
   },
   "GameResults": {
     "gameResults": "Game Results",
@@ -58,7 +62,11 @@
     "markAsInvalid": "Mark as Invalid",
     "finishingReview": "Finishing Review...",
     "finishReview": "Finish Review",
-    "waitingForHost": "Waiting for the host to finish reviewing answers..."
+    "waitingForHost": "Waiting for the host to finish reviewing answers...",
+    "point": "point",
+    "points": "points",
+    "noPoints": "No points",
+    "firstToSubmit": "First to answer!"
   },
   "ThemeInput": {
     "enterThemes": "Enter Themes",
@@ -87,7 +95,8 @@
     "questions": "Questions",
     "playerScores": "Player Scores",
     "playerReady": "Player ready",
-    "playerNotReady": "Player not ready"
+    "playerNotReady": "Player not ready",
+    "gameProgress": "Game Progress"
   },
   "PlayerCard": {
     "host": "Host"
@@ -98,6 +107,37 @@
     "enterYourName": "Enter your name",
     "joining": "Joining...",
     "joinGame": "Join Game"
+  },
+  "LanguageSelector": {
+    "selectLanguage": "Select Language"
+  },
+  "ThemePackSelector": {
+    "selectThemePack": "Select Theme Pack",
+    "filterByLanguage": "Filter by Language",
+    "selectLanguage": "Select Language"
+  },
+  "GameSettings": {
+    "themeSource": "Theme Source",
+    "gameSettings": "Game Settings",
+    "customThemes": "Custom Themes",
+    "themePacks": "Theme Packs",
+    "timedMode": "Timed Mode",
+    "numberOfThemesFromPack": "Number of Themes",
+    "onlyHostCanChange": "Only the host can change game settings.",
+    "timedModeOn": "Timed Mode: On",
+    "timedModeOff": "Timed Mode: Off",
+    "collapseSettings": "Collapse Settings",
+    "expandSettings": "Expand Settings"
+  },
+  "ScrollableScoreList": {
+    "scoreboardTitle": "Scoreboard",
+    "score": "Score",
+    "leader": "Leader"
+  },
+  "FirstAnswerDisplay": {
+    "playerAnswered": "{playerName} has answered!",
+    "timeRemaining": "You have 10 seconds to answer!",
+    "someoneElse": "Someone"
   }
 }
 

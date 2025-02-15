@@ -1,21 +1,185 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useEffect, useState, useRef } from "react"
-import type { RealtimeChannel } from "@supabase/supabase-js"
-import type { RoomState} from "@/lib/types"
-import { fetchRoomData, fetchAnswersForTheme, fetchFinalGameData, fetchPlayers } from "@/app/actions"
+import { createContext, useContext, useReducer, useEffect } from "react"
+import {
+    fetchAnswersForTheme,
+    fetchRoomData,
+    startGame,
+    fetchPlayerScores,
+    submitAnswer,
+    submitTheme,
+    removeTheme,
+    finishReview,
+    resetGame,
+    joinRoom,
+    markAnswerInvalid, setGameState, sendAllThemesSubmittedEvent,
+} from "@/app/actions"
 import { getCurrentUser, signInAnonymously } from "@/lib/client_auth"
-import {createClient} from "@/utils/supabase/client";
+import type { Answer, Player, Theme } from "@/lib/types"
+import { getOrCreateChannel, removeChannel } from "@/utils/supabase/channel"
 
-interface GameChannelContextType {
-    gameState: RoomState | null
-    setGameState: React.Dispatch<React.SetStateAction<RoomState | null>>
+interface RoomState {
+    id: string
+    game_state: "waiting" | "theme_input" | "answer_input" | "review" | "game_over" | "loading"
+    players: Player[]
+    themes: Theme[]
+    current_round: number
+    is_timed_mode: boolean
+    selected_theme_pack_id: number | null
+    num_themes: number
+    currentUserId: string | null
+    theme_pack_language?: string
+    theme_source: "custom" | "pack"
+    timer_started: boolean
+    current_theme_id: number | null
+    first_submit_player_id: number
 }
 
-const GameChannelContext = createContext<GameChannelContextType | undefined>(undefined)
+interface GameSettings {
+    isTimedMode: boolean
+    selectedThemePack: number | null
+    numThemes: number
+    themePackLanguage?: string
+    themeSource: "custom" | "pack"
+}
 
-export const useGameChannel = (): GameChannelContextType => {
+// Define action types
+type Action =
+    | { type: "SET_INITIAL_STATE"; payload: RoomState }
+    | { type: "PLAYER_JOINED"; payload: Player }
+    | { type: "ANSWER_SUBMITTED"; payload: Answer }
+    | { type: "ANSWER_INVALIDATED"; payload: { answerId: number; themeId: number } }
+    | { type: "GAME_STARTED"; payload: { gameState: string; themes: Theme[] } }
+    | { type: "ALL_THEMES_SUBMITTED" }
+    | { type: "ALL_ANSWERS_SUBMITTED"; payload: { themeId: number; answers: Answer[] } }
+    | {
+    type: "REVIEW_FINISHED"
+    payload: { newGameState: string; newRound: number; updatedScores: { id: number; score: number }[] }
+}
+    | { type: "GAME_RESET"; payload: RoomState }
+    | { type: "THEME_REMOVED"; payload: { themeId: number } }
+    | { type: "THEME_SUBMITTED"; payload: { theme: Theme } }
+    | { type: "GAME_SETTINGS_UPDATED"; payload: GameSettings }
+    | { type: "THEMES_FETCHED"; payload: Theme[] }
+    | { type: "NEXT_THEME_FETCHED"; payload: Theme }
+    | { type: "TIMER_STARTED"; payload: { themeId: number, playerId: number } }
+
+// Reducer function
+function gameReducer(state: RoomState, action: Action): RoomState {
+    switch (action.type) {
+        case "SET_INITIAL_STATE":
+            return action.payload
+        case "PLAYER_JOINED":
+            return { ...state, players: [...state.players, action.payload] }
+        case "ANSWER_SUBMITTED":
+            return {
+                ...state,
+                players: state.players.map((player) =>
+                    player.id === action.payload.player_id ? { ...player, answer_ready: true } : player,
+                ),
+            }
+        case "ANSWER_INVALIDATED":
+            return {
+                ...state,
+                themes: state.themes.map((theme) =>
+                    theme.id === action.payload.themeId
+                        ? {
+                            ...theme,
+                            answers: theme.answers.map((answer) =>
+                                answer.id === action.payload.answerId ? { ...answer, invalid: true } : answer,
+                            ),
+                        }
+                        : theme,
+                ),
+            }
+        case "GAME_STARTED":
+            return {
+                ...state,
+                game_state: action.payload.gameState,
+                current_round: 0,
+                themes: action.payload.themes,
+            }
+        case "ALL_THEMES_SUBMITTED":
+            return { ...state, game_state: "answer_input", current_round: 0 }
+        case "ALL_ANSWERS_SUBMITTED":
+            return {
+                ...state,
+                game_state: "review",
+                themes: state.themes.map((theme) =>
+                    theme.id === action.payload.themeId
+                        ? {
+                            ...theme,
+                            answers: action.payload.answers,
+                        }
+                        : theme,
+                ),
+                timer_started: false,
+                first_submit_player_id: null,
+            }
+        case "REVIEW_FINISHED":
+            return {
+                ...state,
+                game_state: action.payload.newGameState,
+                current_round: action.payload.newRound,
+                players: state.players.map((player) => {
+                    const updatedScore = action.payload.updatedScores.find((s) => s.id === player.id)?.score
+                    return updatedScore !== undefined ? { ...player, score: updatedScore, answer_ready: false } : player
+                }),
+                timer_started: false,
+                first_submit_player_id: null,
+            }
+        case "GAME_RESET":
+            return { ...action.payload, currentUserId: state?.currentUserId, timer_started: false, current_theme_id: null, first_submit_player_id: null }
+        case "THEME_REMOVED":
+            return { ...state, themes: state.themes.filter((theme) => theme.id !== action.payload.themeId) }
+        case "THEME_SUBMITTED":
+            return { ...state, themes: [...state.themes, action.payload.theme] }
+        case "GAME_SETTINGS_UPDATED":
+            return {
+                ...state,
+                is_timed_mode: action.payload.isTimedMode,
+                selected_theme_pack_id: action.payload.selectedThemePack,
+                num_themes: action.payload.numThemes,
+                theme_pack_language: action.payload.themePackLanguage,
+                theme_source: action.payload.themeSource,
+            }
+        case "THEMES_FETCHED":
+            return {
+                ...state,
+                themes: action.payload,
+            }
+        case "NEXT_THEME_FETCHED":
+            return {
+                ...state,
+                themes: [...state.themes, action.payload],
+            }
+        case "TIMER_STARTED":
+            return {
+                ...state,
+                timer_started: true,
+                first_submit_player_id: action.payload.playerId,
+                current_theme_id: action.payload.themeId,
+            }
+        default:
+            return state
+    }
+}
+
+const GameChannelContext = createContext<
+    | {
+    state: RoomState | null
+    dispatch: React.Dispatch<Action>
+    sendBroadcast: (event: string, payload: any) => Promise<void>
+}
+    | undefined
+>(undefined)
+
+export const useGameChannel = (): {
+    state: RoomState | null
+    dispatch: React.Dispatch<Action>
+    sendBroadcast: (event: string, payload: any) => Promise<void>
+} => {
     const context = useContext(GameChannelContext)
     if (context === undefined) {
         throw new Error("useGameChannel must be used within a GameChannelProvider")
@@ -29,32 +193,38 @@ interface GameChannelProviderProps {
 }
 
 export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ children, roomId }) => {
-    const [gameState, setGameState] = useState<RoomState | null>(null)
-    const supabase = createClient()
-    const channelRef = useRef<RealtimeChannel | null>(null)
+    const [state, dispatch] = useReducer(gameReducer, {
+        id: roomId,
+        game_state: "loading",
+        players: [],
+        themes: [],
+        current_round: 0,
+        is_timed_mode: false,
+        selected_theme_pack_id: null,
+        num_themes: 0,
+        currentUserId: null,
+        timer_started: false,
+        current_theme_id: null,
+        theme_source: "custom",
+    })
 
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
                 let user = await getCurrentUser()
-
                 if (!user) {
-                    // If no user, attempt to sign in anonymously
                     user = await signInAnonymously()
                 }
-
                 if (!user) {
                     throw new Error("Failed to authenticate user")
                 }
-
                 const roomData = await fetchRoomData(roomId)
-                setGameState((prev) => ({
-                    ...roomData,
-                    currentUserId: user.id,
-                }))
+                dispatch({
+                    type: "SET_INITIAL_STATE",
+                    payload: { ...roomData, currentUserId: user.id, timer_started: false, current_theme_id: null },
+                })
             } catch (error) {
                 console.error("Error fetching initial game data:", error)
-                setGameState(null) // Set game state to null to indicate an error
             }
         }
 
@@ -62,198 +232,287 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
     }, [roomId])
 
     useEffect(() => {
-        const channel = supabase.channel(`room:${roomId}`)
+        const channel = getOrCreateChannel(roomId)
 
         channel
             .on("broadcast", { event: "player_joined" }, ({ payload }) => {
-                setGameState((prev): RoomState | null =>
-                    prev
-                        ? {
-                            ...prev,
-                            players: [...prev.players, payload.player],
-                        }
-                        : null,
-                )
+                dispatch({ type: "PLAYER_JOINED", payload: payload.player })
             })
             .on("broadcast", { event: "answer_submitted" }, ({ payload }) => {
-                setGameState((prev): RoomState | null =>
-                    prev
-                        ? {
-                            ...prev,
-                            themes: prev.themes.map((theme) =>
-                                theme.id === payload.answer.theme_id
-                                    ? {
-                                        ...theme,
-                                        answers: [...(theme.answers || []), payload.answer],
-                                    }
-                                    : theme,
-                            ),
-                            players: prev.players.map((player) =>
-                                player.id === payload.answer.player_id ? { ...player, answer_ready: true } : player,
-                            ),
-                        }
-                        : null,
-                )
+                dispatch({ type: "ANSWER_SUBMITTED", payload: payload.answer })
             })
             .on("broadcast", { event: "answer_invalidated" }, ({ payload }) => {
-                setGameState((prev): RoomState | null =>
-                    prev
-                        ? {
-                            ...prev,
-                            themes: prev.themes.map((theme) =>
-                                theme.id === payload.themeId
-                                    ? {
-                                        ...theme,
-                                        answers: theme.answers.map((answer) =>
-                                            answer.id === payload.answerId ? { ...answer, invalid: true } : answer,
-                                        ),
-                                    }
-                                    : theme,
-                            ),
-                        }
-                        : null,
-                )
+                dispatch({ type: "ANSWER_INVALIDATED", payload: payload })
             })
-            .on("broadcast", { event: "game_started" }, () => {
-                setGameState((prev): RoomState | null =>
-                    prev
-                        ? {
-                            ...prev,
-                            game_state: "theme_input",
-                            current_round: 0,
-                        }
-                        : null,
-                )
-            })
-            .on("broadcast", { event: "all_themes_submitted" }, async () => {
-                setGameState((prev): RoomState | null =>
-                    prev
-                        ? {
-                            ...prev,
-                            game_state: "answer_input",
-                            current_round: 0,
-                        }
-                        : null,
-                )
-            })
-            .on("broadcast", { event: "all_answers_submitted" }, ({ payload }) => {
-                setGameState((prev): RoomState | null => {
-                    if (!prev) return null
-
-                    const currentTheme = prev.themes.find((theme) => theme.id === payload.themeId)
-                    if (!currentTheme) return prev
-
-                    const expectedAnswerCount = prev.players.length
-                    const currentAnswerCount = currentTheme.answers ? currentTheme.answers.length : 0
-
-                    if (currentAnswerCount !== expectedAnswerCount) {
-                        fetchAnswersForTheme(roomId, payload.themeId).then((answers) => {
-                            setGameState((prevState): RoomState | null =>
-                                prevState
-                                    ? {
-                                        ...prevState,
-                                        themes: prevState.themes.map((theme) =>
-                                            theme.id === payload.themeId ? { ...theme, answers } : theme,
-                                        ),
-                                        game_state: "review",
-                                    }
-                                    : null,
-                            )
-                        })
-                    }
-
-                    return {
-                        ...prev,
-                        game_state: "review",
-                    }
+            .on("broadcast", { event: "game_started" }, ({ payload }) => {
+                dispatch({
+                    type: "GAME_STARTED",
+                    payload: {
+                        gameState: payload.gameState,
+                        themes: payload.themes,
+                    },
                 })
             })
+            .on("broadcast", { event: "all_themes_submitted" }, () => {
+                dispatch({ type: "ALL_THEMES_SUBMITTED" })
+            })
+            .on("broadcast", { event: "all_answers_submitted" }, async ({ payload }) => {
+                try {
+                    const answers = await fetchAnswersForTheme(roomId, payload.themeId)
+                    dispatch({ type: "ALL_ANSWERS_SUBMITTED", payload: { themeId: payload.themeId, answers } })
+                } catch (error) {
+                    console.error("Error fetching answers:", error)
+                }
+            })
             .on("broadcast", { event: "review_finished" }, async ({ payload }) => {
-                if (payload.isGameOver) {
-                    try {
-                        const { players, themes } = await fetchFinalGameData(roomId)
-                        setGameState((prev): RoomState | null =>
-                            prev
-                                ? {
-                                    ...prev,
-                                    game_state: "game_over",
-                                    players: players.map((player) => ({ ...player, answer_ready: false })),
-                                    themes,
-                                }
-                                : null,
-                        )
-                    } catch (error) {
-                        console.error("Error fetching final game data:", error)
-                    }
-                } else {
-                    try {
-                        const updatedPlayers = await fetchPlayers(roomId)
-                        setGameState((prev): RoomState | null =>
-                            prev
-                                ? {
-                                    ...prev,
-                                    game_state: payload.newGameState,
-                                    current_round: payload.newRound,
-                                    players: updatedPlayers.map((player) => ({ ...player, answer_ready: false })),
-                                }
-                                : null,
-                        )
-                    } catch (error) {
-                        console.error("Error fetching updated player data:", error)
-                    }
+                try {
+                    const updatedScores = await fetchPlayerScores(roomId)
+                    dispatch({
+                        type: "REVIEW_FINISHED",
+                        payload: { ...payload, updatedScores },
+                    })
+                } catch (error) {
+                    console.error("Error fetching updated scores:", error)
                 }
             })
             .on("broadcast", { event: "game_reset" }, async () => {
                 try {
                     const roomData = await fetchRoomData(roomId)
-                    setGameState(
-                        (prev): RoomState => ({
-                            ...roomData,
-                            players: roomData.players.map((player) => ({
-                                ...player,
-                                answer_ready: false,
-                                score: 0,
-                            })),
-                            themes: [],
-                            currentUserId: prev ? prev.currentUserId : null,
-                        }),
-                    )
+                    dispatch({
+                        type: "GAME_RESET",
+                        payload: roomData,
+                    })
                 } catch (error) {
                     console.error("Error fetching room data after game reset:", error)
                 }
             })
             .on("broadcast", { event: "theme_removed" }, ({ payload }) => {
-                setGameState((prev): RoomState | null =>
-                    prev
-                        ? {
-                            ...prev,
-                            themes: prev.themes.filter((theme) => theme.id !== payload.themeId),
-                        }
-                        : null,
-                )
+                dispatch({ type: "THEME_REMOVED", payload: payload })
             })
             .on("broadcast", { event: "theme_submitted" }, ({ payload }) => {
-                setGameState((prev): RoomState | null =>
-                    prev
-                        ? {
-                            ...prev,
-                            themes: [...prev.themes, payload.theme],
-                        }
-                        : null,
-                )
+                dispatch({ type: "THEME_SUBMITTED", payload: payload })
             })
-            .subscribe((status) => {})
-
-        channelRef.current = channel
+            .on("broadcast", { event: "game_settings_updated" }, ({ payload }) => {
+                dispatch({ type: "GAME_SETTINGS_UPDATED", payload: payload.settings })
+            })
+            .on("broadcast", { event: "timer_started" }, ({ payload }) => {
+                dispatch({ type: "TIMER_STARTED", payload: { themeId: payload.themeId, playerId: payload.playerId }})
+            })
+            .subscribe((status) => {
+                console.log("Channel status:", status)
+            })
 
         return () => {
-            if (channelRef.current) {
-                supabase.removeChannel(channelRef.current)
-                channelRef.current = null
-            }
+            removeChannel(roomId)
         }
-    }, [roomId, supabase]) // Added supabase to the dependency array
+    }, [roomId])
 
-    return <GameChannelContext.Provider value={{ gameState, setGameState }}>{children}</GameChannelContext.Provider>
+    const sendBroadcast = async (event: string, payload: any) => {
+        const channel = getOrCreateChannel(roomId)
+        await channel.send({
+            type: "broadcast",
+            event: event,
+            payload: payload,
+        })
+    }
+
+    return (
+        <GameChannelContext.Provider value={{ state, dispatch, sendBroadcast }}>{children}</GameChannelContext.Provider>
+    )
+}
+
+// Custom hooks for game actions
+export const useStartGame = (roomId: string) => {
+    const { dispatch, sendBroadcast } = useContext(GameChannelContext)
+    return async (gameSettings: {
+        themeSource: "custom" | "pack"
+        selectedThemePack: number | null
+        numThemes: number
+        isTimedMode: boolean
+    }) => {
+        try {
+            const result = await startGame(roomId, gameSettings)
+
+            if (!result.themes) {
+                result.themes = []
+            }
+
+            dispatch({
+                type: "GAME_STARTED",
+                payload: { gameState: result.game_state, themes: result.themes },
+            })
+            await sendBroadcast("game_started", { gameState: result.game_state, themes: result.themes })
+        } catch (error) {
+            console.error("Failed to start game:", error)
+        }
+    }
+}
+
+export const useSubmitAnswer = (roomId: string) => {
+    const { dispatch, sendBroadcast } = useContext(GameChannelContext)
+    return async (playerId: number, themeId: number, answer: string) => {
+        try {
+            const result = await submitAnswer(roomId, playerId, themeId, answer)
+            const answerData = { player_id: playerId, theme_id: themeId }
+
+            if (result.is_first_answer) {
+                dispatch({ type: "TIMER_STARTED", payload: { themeId, playerId } })
+                await sendBroadcast("timer_started", { themeId, playerId })
+            }
+
+            dispatch({ type: "ANSWER_SUBMITTED", payload: answerData })
+            await sendBroadcast("answer_submitted", { answer: answerData })
+            if (result.all_answered) {
+                const answers = await fetchAnswersForTheme(roomId, themeId)
+                dispatch({ type: "ALL_ANSWERS_SUBMITTED", payload: { themeId: themeId, answers } })
+                await sendBroadcast("all_answers_submitted", { themeId })
+            }
+        } catch (error) {
+            console.error("Failed to submit answer:", error)
+        }
+    }
+}
+
+export const useSubmitTheme = (roomId: string) => {
+    const { dispatch, sendBroadcast } = useContext(GameChannelContext)
+    return async (question: string, playerId: number) => {
+        try {
+            const newTheme = await submitTheme(roomId, question, playerId)
+            dispatch({ type: "THEME_SUBMITTED", payload: { theme: newTheme } })
+            await sendBroadcast("theme_submitted", { theme: newTheme })
+        } catch (error) {
+            console.error("Failed to submit theme:", error)
+        }
+    }
+}
+
+export const useMarkAsInvalid = (roomId: string) => {
+    const { dispatch, sendBroadcast } = useContext(GameChannelContext)
+    return async (answerId: number, themeId: number) => {
+        try {
+            await markAnswerInvalid(roomId, answerId)
+            dispatch({ type: "ANSWER_INVALIDATED", payload: { answerId, themeId } })
+            await sendBroadcast("answer_invalidated", { answerId, themeId })
+        } catch (error) {
+            console.error("Failed to mark answer as invalid:", error)
+        }
+    }
+}
+
+export const useRemoveTheme = (roomId: string) => {
+    const { dispatch, sendBroadcast } = useContext(GameChannelContext)
+    return async (themeId: number) => {
+        try {
+            await removeTheme(roomId, themeId)
+            dispatch({ type: "THEME_REMOVED", payload: { themeId } })
+            await sendBroadcast("theme_removed", { themeId })
+        } catch (error) {
+            console.error("Failed to remove theme:", error)
+        }
+    }
+}
+
+export const useSubmitAllThemes = (roomId: string) => {
+    const { dispatch, sendBroadcast } = useContext(GameChannelContext)
+    return async (themeCount: number) => {
+        try {
+            await sendAllThemesSubmittedEvent(roomId, themeCount)
+            await sendBroadcast("all_themes_submitted", {})
+            dispatch({ type: "ALL_THEMES_SUBMITTED" })
+        } catch (error) {
+            console.error("Failed to submit all themes:", error)
+        }
+    }
+
+}
+
+export const useFinishReview = (roomId: string) => {
+    const { dispatch, sendBroadcast } = useContext(GameChannelContext)
+    return async (themeId: number) => {
+        try {
+            const result = await finishReview(roomId, themeId)
+            dispatch({
+                type: "REVIEW_FINISHED",
+                payload: {
+                    newGameState: result.room.game_state,
+                    newRound: result.room.current_round,
+                    updatedScores: result.playerScores,
+                },
+            })
+            await sendBroadcast("review_finished", {
+                newGameState: result.room.game_state,
+                newRound: result.room.current_round,
+                updatedScores: result.playerScores,
+            })
+        } catch (error) {
+            console.error("Failed to finish review:", error)
+        }
+    }
+}
+
+export const useResetGame = (roomId: string) => {
+    const { dispatch, sendBroadcast } = useContext(GameChannelContext)
+    return async () => {
+        try {
+            await resetGame(roomId)
+            try {
+                const roomData = await fetchRoomData(roomId)
+                dispatch({
+                    type: "GAME_RESET",
+                    payload: roomData,
+                })
+            } catch (error) {
+                console.error("Error fetching room data after game reset:", error)
+            }
+            await sendBroadcast("game_reset", {})
+        } catch (error) {
+            console.error("Failed to reset game:", error)
+        }
+    }
+}
+
+export const useUpdateGameSettings = (roomId: string) => {
+    const { dispatch, sendBroadcast } = useContext(GameChannelContext)
+    return async (settings: GameSettings) => {
+        try {
+            dispatch({ type: "GAME_SETTINGS_UPDATED", payload: settings })
+            await sendBroadcast("game_settings_updated", { settings })
+        } catch (error) {
+            console.error("Failed to update game settings:", error)
+        }
+    }
+}
+
+export const useJoinRoom = (roomId: string) => {
+    const { dispatch, sendBroadcast } = useContext(GameChannelContext)
+    return async (playerName: string, token: string) => {
+        try {
+            const result = await joinRoom(roomId, playerName, token)
+            if (result) {
+                dispatch({ type: "PLAYER_JOINED", payload: result })
+                await sendBroadcast("player_joined", { player: result })
+            } else {
+                throw new Error("Failed to join room")
+            }
+        } catch (error) {
+            console.error("Failed to join room:", error)
+            throw error
+        }
+    }
+}
+
+export const useExpireTimer = (roomId: string) => {
+    const { dispatch, sendBroadcast } = useContext(GameChannelContext)
+    return async (themeId: number) => {
+        try {
+            const answers = await fetchAnswersForTheme(roomId, themeId)
+            dispatch({ type: "ALL_ANSWERS_SUBMITTED", payload: { themeId, answers } })
+            await sendBroadcast("all_answers_submitted", { themeId })
+
+            await setGameState(roomId, "review")
+        } catch (error) {
+            console.error("Failed to expire timer:", error)
+        }
+    }
 }
 

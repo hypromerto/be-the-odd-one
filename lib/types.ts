@@ -1,7 +1,7 @@
 import exp from "constants"
 
 export interface Player {
-    id: string
+    id: number
     user_id: string
     room_id: string
     name: string
@@ -12,12 +12,13 @@ export interface Player {
 }
 
 export interface Answer {
-    id: string
+    id: number
     theme_id: number
     player_id: string
     player_name: string
     answer: string
     invalid: boolean
+    created_at: number
 }
 
 export interface Theme {
@@ -30,7 +31,7 @@ export interface Theme {
 }
 
 export interface RoomState {
-    id: string
+    id: number
     room_id: string
     game_state: "waiting" | "theme_input" | "answer_input" | "review" | "game_over"
     current_round: number
@@ -44,7 +45,7 @@ export interface Author {
 }
 
 export interface PlayerScore {
-    id: string
+    id: number
     name: string
     avatar: string
     score: number

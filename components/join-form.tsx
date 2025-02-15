@@ -9,6 +9,7 @@ import { isRedirectError } from "next/dist/client/components/redirect"
 import Script from "next/script"
 import { useTranslations } from "next-intl"
 import {useRouter} from "@/i18n/routing";
+import {useJoinRoom} from "@/contexts/GameChannelContext";
 
 interface JoinFormProps {
     roomId: string
@@ -21,6 +22,7 @@ export default function JoinForm({ roomId }: JoinFormProps) {
     const [isJoining, setIsJoining] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const router = useRouter()
+    const joinRoom = useJoinRoom(roomId)
     const t = useTranslations("JoinForm")
 
     const handleJoinGame = async () => {
@@ -41,7 +43,7 @@ export default function JoinForm({ roomId }: JoinFormProps) {
                     .execute(SITE_KEY, { action: "submit" })
                     .then(async (token) => {
                         /* send data to the server */
-                        await joinRoom(roomId, joiningName)
+                        await joinRoom(joiningName, token)
                         router.refresh()
                     }).catch((error) => {
                     console.error("Failed to join game:", error)

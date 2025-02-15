@@ -4,9 +4,8 @@ import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { submitTheme, removeTheme, sendAllThemesSubmittedEvent } from "@/app/actions"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { useGameChannel } from "@/contexts/GameChannelContext"
+import {useGameChannel, useSubmitTheme, useRemoveTheme, useSubmitAllThemes} from "@/contexts/GameChannelContext"
 import { SharedThemePool } from "./shared-theme-pool"
 
 interface ThemeInputProps {
@@ -16,33 +15,35 @@ interface ThemeInputProps {
 export default function ThemeInput({ roomId }: ThemeInputProps) {
     const [theme, setTheme] = useState("")
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [isSubmittingTheme, setIsSubmittingTheme] = useState(false)
     const [error, setError] = useState("")
-    const { gameState, setGameState } = useGameChannel()
+    const { state: gameState } = useGameChannel()
+    const submitTheme = useSubmitTheme(roomId)
+    const removeTheme = useRemoveTheme(roomId)
     const t = useTranslations("ThemeInput")
+    const submitAllThemes = useSubmitAllThemes(roomId)
 
     const currentPlayer = gameState?.players.find((player) => player.user_id === gameState.currentUserId) || null
     const isHost = currentPlayer?.is_host || false
 
     const handleAddTheme = async () => {
-        if (isSubmittingTheme) return
-        setIsSubmittingTheme(true)
         if (theme.trim()) {
+            setIsSubmitting(true)
             try {
-                const newTheme = await submitTheme(roomId, theme.trim(), currentPlayer.id)
+                await submitTheme(theme.trim(), currentPlayer.id)
                 setTheme("")
             } catch (error) {
                 console.error("Failed to add theme:", error)
                 setError("Failed to add theme. Please try again.")
+            } finally {
+                setIsSubmitting(false)
             }
         }
-        setIsSubmittingTheme(false)
     }
 
     const handleRemoveTheme = async (themeId: number) => {
         if (isHost) {
             try {
-                await removeTheme(roomId, themeId)
+                await removeTheme(themeId)
             } catch (error) {
                 console.error("Failed to remove theme:", error)
                 setError("Failed to remove theme. Please try again.")
@@ -54,7 +55,7 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
         if (isHost && gameState?.themes.length > 0) {
             setIsSubmitting(true)
             try {
-                await sendAllThemesSubmittedEvent(roomId)
+                await submitAllThemes(gameState?.themes.length)
             } catch (error) {
                 console.error("Failed to start game:", error)
                 setError("Failed to start game. Please try again.")
@@ -82,10 +83,10 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
                     />
                     <Button
                         onClick={handleAddTheme}
-                        disabled={isSubmittingTheme}
+                        disabled={isSubmitting}
                         className="w-full sm:w-1/3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg"
                     >
-                        {isSubmittingTheme ? t("adding") : t("add")}
+                        {isSubmitting ? t("adding") : t("add")}
                     </Button>
                 </div>
                 {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -93,7 +94,7 @@ export default function ThemeInput({ roomId }: ThemeInputProps) {
                 {isHost && (
                     <Button
                         onClick={handleStartGame}
-                        disabled={isSubmitting || gameState?.themes.length === 0}
+                        disabled={isSubmitting || !gameState?.themes || gameState?.themes.length === 0}
                         className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full text-lg transform hover:scale-105 transition-transform duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSubmitting ? t("startingGame") : t("startGame")}

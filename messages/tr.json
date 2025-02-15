@@ -15,13 +15,18 @@
   "creating": "Oluşturuluyor...",
   "joining": "Katılınıyor...",
   "LanguageSwitcher": {
+    "switchLanguage": "Dil değiştir",
     "switchToEnglish": "Switch to English",
     "switchToTurkish": "Türkçe'ye geç"
   },
   "switchToEnglish": "Switch to English",
   "switchToTurkish": "Türkçe'ye geç",
+  "LanguageSelector": {
+    "selectLanguage": "Dil Seçin"
+  },
   "RoomContent": {
     "loadingGameState": "Yükleniyor...",
+    "gameSettings": "Oyun Ayarları",
     "waitingForOtherPlayers": "Diğer oyuncular bekleniyor",
     "answerSubmitted": "Cevabınızı gönderdiniz. Lütfen diğer oyuncuların cevaplarını göndermesini bekleyin.",
     "gameName": "Be the Odd One",
@@ -33,7 +38,9 @@
     "needMorePlayers": "Oyunu başlatmak için en az 3 oyuncu gereklidir. Daha fazla oyuncu davet edin!",
     "startingGame": "Oyun Başlatılıyor...",
     "startGame": "Oyunu Başlat",
-    "needThreePlayers": "Başlatmak için en az 3 oyuncu gerekiyor"
+    "needThreePlayers": "Başlatmak için en az 3 oyuncu gerekiyor",
+    "waitingForGameToStart": "Oyunun başlaması bekleniyor",
+    "themePackSelected": "Tema paketi seçildi"
   },
   "GameResults": {
     "gameResults": "Oyun Sonuçları",
@@ -58,7 +65,11 @@
     "markAsInvalid": "Geçersiz Olarak İşaretle",
     "finishingReview": "İnceleme Tamamlanıyor...",
     "finishReview": "İncelemeyi Tamamla",
-    "waitingForHost": "Oda sahibinin cevapları incelemeyi bitirmesi bekleniyor..."
+    "waitingForHost": "Oda sahibinin cevapları incelemeyi bitirmesi bekleniyor...",
+    "point": "puan",
+    "points": "puan",
+    "noPoints": "Puan yok",
+    "firstToSubmit": "İlk cevaplayan!"
   },
   "ThemeInput": {
     "enterThemes": "Temaları Girin",
@@ -87,7 +98,8 @@
     "questions": "Sorular",
     "playerScores": "Oyuncu Puanları",
     "playerReady": "Oyuncu hazır",
-    "playerNotReady": "Oyuncu hazır değil"
+    "playerNotReady": "Oyuncu hazır değil",
+    "gameProgress": "Oyun İlerlemesi"
   },
   "PlayerCard": {
     "host": "Oda Sahibi"
@@ -98,6 +110,34 @@
     "enterYourName": "Adınızı girin",
     "joining": "Katılınıyor...",
     "joinGame": "Oyuna Katıl"
+  },
+  "ThemePackSelector": {
+    "selectThemePack": "Tema Paketi Seç",
+    "filterByLanguage": "Dile Göre Filtrele",
+    "selectLanguage": "Dil Seçin"
+  },
+  "GameSettings": {
+    "themeSource": "Tema Kaynağı",
+    "gameSettings": "Oyun Ayarları",
+    "customThemes": "Özel Temalar",
+    "themePacks": "Tema Paketleri",
+    "timedMode": "Zamanlı Mod",
+    "numberOfThemesFromPack": "Tema Sayısı",
+    "onlyHostCanChange": "Sadece oda sahibi oyun ayarlarını değiştirebilir.",
+    "timedModeOn": "Zamanlı Mod: Açık",
+    "timedModeOff": "Zamanlı Mod: Kapalı",
+    "collapseSettings": "Ayarları Daralt",
+    "expandSettings": "Ayarları Genişlet"
+  },
+  "ScrollableScoreList": {
+    "scoreboardTitle": "Skor Tablosu",
+    "score": "Puan",
+    "leader": "Lider"
+  },
+  "FirstAnswerDisplay": {
+    "playerAnswered": "{playerName} cevap verdi!",
+    "timeRemaining": "Cevap vermek için 10 saniyeniz var!",
+    "someoneElse": "Birisi"
   }
 }
 

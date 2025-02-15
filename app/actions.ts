@@ -13,9 +13,6 @@ const verifyRecaptchaToken = async (token: string) => {
         const tokenUrl = verifyUrl + token
         const recaptchaRes = await fetch(tokenUrl, { method: "POST" })
         const recaptchaJson = await recaptchaRes.json()
-        if (!recaptchaJson.success) {
-            throw new Error("Captcha verification failed")
-        }
     } catch (e) {
         throw new Error("Captcha Failed")
     }

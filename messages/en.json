@@ -25,19 +25,7 @@
     "loadingGameState": "Loading...",
     "waitingForOtherPlayers": "Waiting for other players",
     "answerSubmitted": "You've submitted your answer. Please wait for other players to submit their answers.",
-    "gameName": "Be the Odd One",
-    "roomId": "Room ID",
-    "copied": "Copied!",
-    "copyGameLink": "Copy Game Link",
-    "shareLink": "Share this link with others to invite them to the game!",
-    "players": "Players",
-    "needMorePlayers": "At least 3 players are required to start the game. Invite more players to join!",
-    "startingGame": "Starting Game...",
-    "startGame": "Start Game",
-    "needThreePlayers": "Need at least 3 players to start",
-    "waitingForGameToStart": "Waiting for the game to start",
-    "themePackSelected": "Theme pack has been selected",
-    "gameSettings": "Game Settings"
+    "gameName": "Be the Odd One"
   },
   "GameResults": {
     "gameResults": "Game Results",
@@ -138,6 +126,65 @@
     "scoreboardTitle": "Scoreboard",
     "score": "Score",
     "leader": "Leader"
+  },
+  "HowToPlay": {
+    "title": "How to Play",
+    "gameObjective": "Game Objective",
+    "gameObjectiveDesc": "Think fast and be creative! Answer prompts based on themes and earn points for unique answers.",
+    "howToPlayTitle": "How to Play",
+    "step1": "Join or create a room and wait for at least 3 players.",
+    "step2": "Each round, you'll see a theme and need to provide a relevant answer.",
+    "step3": "Be quick! In timed mode, faster answers get more points.",
+    "step4": "Avoid duplicate answers - they won't earn any points!",
+    "scoringTitle": "Scoring",
+    "scoringDesc": "Earn points for unique answers. First valid answers get bonus points in timed mode!",
+    "tipsTitle": "Tips for Success",
+    "tip1": "Be creative and think outside the box!",
+    "tip2": "Keep an eye on the timer in timed mode.",
+    "tip3": "Try to avoid obvious answers that others might think of."
+  },
+  "PlayerList": {
+    "host": "Host",
+    "players": "Players"
+  },
+  "Header": {
+    "home": "Home",
+    "privacy": "Privacy",
+    "termsOfService": "Terms of Service",
+    "about": "About"
+  },
+  "Lobby": {
+    "howToPlay": "How to Play",
+    "gameObjectiveDesc": "Think fast and be creative! Answer prompts based on themes and earn points for unique answers.",
+    "step1Custom": "Players take turns submitting themes for each round.",
+    "step1ThemePack": "Themes are automatically selected from the chosen theme pack.",
+    "step2": "Everyone races to provide a unique answer to the current theme.",
+    "step3": "Answers are revealed, and points are awarded for originality.",
+    "step4": "The player with the most points at the end wins!",
+    "stepTitle1Custom": "Submit Themes",
+    "stepTitle1ThemePack": "Theme Selection",
+    "stepTitle2": "Answer Quickly",
+    "stepTitle3": "Score Points",
+    "stepTitle4": "Win the Game",
+    "protip": "Pro Tip: Think outside the box for truly unique answers!",
+    "minPlayers": "Minimum 3 players required to start",
+    "roomId": "Room ID",
+    "copied": "Copied!",
+    "gameSettings": "Game Settings",
+    "copyGameLink": "Invite!",
+    "shareLink": "Share this link with others to invite them to the game!",
+    "players": "Players",
+    "needMorePlayers": "At least 3 players are required to start the game. Invite more players to join!",
+    "startingGame": "Starting Game...",
+    "startGame": "Start Game",
+    "needThreePlayers": "Need at least 3 players to start",
+    "waitingForGameToStart": "Waiting for the game to start",
+    "themePackSelected": "Theme pack has been selected",
+    "settings": "Settings"
+  },
+  "RoundStartCountdown": {
+    "roundStarting": "Round Starting",
+    "getReady": "Get ready! The next round is about to begin..."
   }
 }
 

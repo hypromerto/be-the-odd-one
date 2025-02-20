@@ -40,7 +40,7 @@ export default async function RoomPage({ params }: { params: { id: string; local
     const isPlayerInRoom = room.players.some((player: { user_id: string }) => player.user_id === user.id)
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="flex items-center justify-center p-4">
             <Script src={`https://www.google.com/recaptcha/api/js?render=${SITE_KEY}`} />
             <GameWrapper roomId={params.id}>
                 {isPlayerInRoom ? <RoomContent roomId={params.id} currentUserId={user.id} /> : <JoinForm roomId={params.id} />}

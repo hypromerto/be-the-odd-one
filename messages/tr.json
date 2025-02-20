@@ -26,21 +26,8 @@
   },
   "RoomContent": {
     "loadingGameState": "Yükleniyor...",
-    "gameSettings": "Oyun Ayarları",
-    "waitingForOtherPlayers": "Diğer oyuncular bekleniyor",
     "answerSubmitted": "Cevabınızı gönderdiniz. Lütfen diğer oyuncuların cevaplarını göndermesini bekleyin.",
-    "gameName": "Be the Odd One",
-    "roomId": "Oda ID",
-    "copied": "Kopyalandı!",
-    "copyGameLink": "Oyun Bağlantısını Kopyala",
-    "shareLink": "Bu bağlantıyı başkalarıyla paylaşarak onları oyuna davet edin!",
-    "players": "Oyuncular",
-    "needMorePlayers": "Oyunu başlatmak için en az 3 oyuncu gereklidir. Daha fazla oyuncu davet edin!",
-    "startingGame": "Oyun Başlatılıyor...",
-    "startGame": "Oyunu Başlat",
-    "needThreePlayers": "Başlatmak için en az 3 oyuncu gerekiyor",
-    "waitingForGameToStart": "Oyunun başlaması bekleniyor",
-    "themePackSelected": "Tema paketi seçildi"
+    "gameName": "Be the Odd One"
   },
   "GameResults": {
     "gameResults": "Oyun Sonuçları",
@@ -138,6 +125,65 @@
     "scoreboardTitle": "Skor Tablosu",
     "score": "Puan",
     "leader": "Lider"
+  },
+  "HowToPlay": {
+    "title": "Nasıl Oynanır",
+    "gameObjective": "Oyunun Amacı",
+    "gameObjectiveDesc": "Hızlı düşün ve yaratıcı ol! Temalara göre cevaplar ver ve özgün cevaplarla puan kazan.",
+    "howToPlayTitle": "Nasıl Oynanır",
+    "step1": "Bir odaya katıl veya oda oluştur ve en az 3 oyuncu bekle.",
+    "step2": "Her turda bir tema göreceksin ve ilgili bir cevap vermen gerekecek.",
+    "step3": "Hızlı ol! Zamanlı modda, hızlı cevaplar daha çok puan kazandırır.",
+    "step4": "Tekrar eden cevaplardan kaçın - bunlar puan kazandırmaz!",
+    "scoringTitle": "Puanlama",
+    "scoringDesc": "Özgün cevaplar için puan kazan. Zamanlı modda ilk geçerli cevaplar bonus puan kazandırır!",
+    "tipsTitle": "Başarı İpuçları",
+    "tip1": "Yaratıcı ol ve alışılmışın dışında düşün!",
+    "tip2": "Zamanlı modda süreyi takip et.",
+    "tip3": "Başkalarının da düşünebileceği bariz cevaplardan kaçın."
+  },
+  "PlayerList": {
+    "host": "Oda Sahibi",
+    "players": "Oyuncular"
+  },
+  "Header": {
+    "home": "Ana Sayfa",
+    "privacy": "Gizlilik",
+    "termsOfService": "Kullanım Şartları",
+    "about": "Hakkında"
+  },
+  "Lobby": {
+    "howToPlay": "Nasıl Oynanır?",
+    "gameObjectiveDesc": "Hızlı düşün ve yaratıcı ol! Temalara göre cevaplar ver ve benzersiz cevaplarla puan kazan.",
+    "step1Custom": "Oyuncular sırayla her tur için temalar belirler.",
+    "step1ThemePack": "Temalar, seçilen tema paketinden otomatik olarak seçilir.",
+    "step2": "Herkes mevcut temaya özgün bir cevap vermek için yarışır.",
+    "step3": "Cevaplar açıklanır ve özgünlüğe göre puanlar verilir.",
+    "step4": "En çok puanı toplayan oyuncu oyunu kazanır!",
+    "stepTitle1Custom": "Tema Belirle",
+    "stepTitle1ThemePack": "Tema Seçimi",
+    "stepTitle2": "Hızlı Cevapla",
+    "stepTitle3": "Puan Kazan",
+    "stepTitle4": "Oyunu Kazan",
+    "minPlayers": "Başlamak için en az 3 oyuncu gerekli",
+    "gameSettings": "Oyun Ayarları",
+    "waitingForOtherPlayers": "Diğer oyuncular bekleniyor",
+    "roomId": "Oda ID",
+    "copied": "Kopyalandı!",
+    "copyGameLink": "Davet et!",
+    "shareLink": "Bu bağlantıyı başkalarıyla paylaşarak onları oyuna davet edin!",
+    "players": "Oda",
+    "needMorePlayers": "Oyunu başlatmak için en az 3 oyuncu gereklidir. Daha fazla oyuncu davet edin!",
+    "startingGame": "Oyun Başlatılıyor...",
+    "startGame": "Oyunu Başlat",
+    "needThreePlayers": "Başlatmak için en az 3 oyuncu gerekiyor",
+    "waitingForGameToStart": "Oyunun başlaması bekleniyor",
+    "themePackSelected": "Tema paketi seçildi",
+    "settings": "Ayarlar"
+  },
+  "RoundStartCountdown": {
+    "roundStarting": "Tur Başlıyor",
+    "getReady": "Hazır olun! Bir sonraki tur başlamak üzere..."
   }
 }
 

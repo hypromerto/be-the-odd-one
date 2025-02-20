@@ -103,7 +103,7 @@ export default function GameResults({
     }
 
     return (
-        <div className="flex flex-col items-center space-y-6 bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-2xl mx-auto text-indigo-800">
+        <div className="flex flex-col items-center space-y-6 backdrop-blur-sm rounded-lg shadow-lg p-4 sm:p-6 w-full max-w-2xl mx-auto text-indigo-800">
             <h2 className="text-2xl sm:text-3xl font-bold mb-4">{t("gameResults")}</h2>
 
             {renderPodium()}

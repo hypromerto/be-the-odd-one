@@ -29,7 +29,7 @@ export default function GameProgress({ roomState }: GameProgressProps) {
 
     return (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <Card className="w-full bg-white/90 backdrop-blur-sm shadow-md">
+            <Card className="w-full backdrop-blur-sm shadow-md">
                 <CardContent className="p-4 space-y-4">
                     <div className="flex justify-between items-center mb-2">
                         <h3 className="text-lg font-semibold text-indigo-800">{t("gameProgress")}</h3>

@@ -75,7 +75,7 @@ export default function HomePage() {
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
             <Script src={`https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`} />
             <AnimatedContent>
-                <Card className="w-full backdrop-blur-sm bg-white/90 shadow-xl">
+                <Card className="w-full backdrop-blur-sm  shadow-xl">
                     <CardHeader>
                         <CardTitle className="text-3xl font-bold text-center text-indigo-800">{t("gameName")}</CardTitle>
                         <CardDescription className="text-center text-indigo-600">{t("gameDescription")}</CardDescription>

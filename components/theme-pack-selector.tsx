@@ -59,9 +59,9 @@ export default function ThemePackSelector({ isHost, selectedThemePack, onThemePa
 
     return (
         <div className="space-y-4">
-            <Card className="w-full bg-white/90 backdrop-blur-sm shadow-sm">
-                <CardContent className="p-4">
-                    <div className="flex items-center space-x-2 mb-2">
+            <Card className="w-full backdrop-blur-sm shadow-sm">
+                <CardContent className="p-3">
+                    <div className="flex items-center space-x-2 mb-1">
                         <Globe className="w-5 h-5 text-indigo-600" />
                         <Label className="text-sm font-medium text-indigo-800">{t("selectLanguage")}</Label>
                     </div>
@@ -85,16 +85,16 @@ export default function ThemePackSelector({ isHost, selectedThemePack, onThemePa
             <h3 className="text-lg font-semibold text-indigo-800">{t("selectThemePack")}</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {themePacks.map((pack) => (
-                    <motion.div key={pack.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <motion.div key={pack.id} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="aspect-square">
                         <Card
-                            className={`cursor-pointer transition-all duration-200 ${
+                            className={`h-full cursor-pointer transition-all duration-200 ${
                                 selectedThemePack === pack.id
                                     ? "border-2 border-indigo-500 bg-indigo-100 shadow-lg"
                                     : "border border-indigo-200 hover:border-indigo-300 hover:bg-indigo-50"
                             }`}
                             onClick={() => handleThemePackSelect(pack.id)}
                         >
-                            <CardContent className="p-4 flex flex-col items-center">
+                            <CardContent className="flex flex-col items-center justify-center h-full p-4">
                                 <div className="w-16 h-16 rounded-full bg-indigo-200 flex items-center justify-center mb-2">
                                     <Image
                                         src={`/theme-icons/${pack.icon}.png`}

@@ -48,11 +48,11 @@ export default async function RootLayout({
             <footer className="hidden lg:block py-4 text-center text-sm text-indigo-600/80 backdrop-blur-sm">
                 <div className="container mx-auto">
                     <div className="space-x-4">
-                        <a href="/privacy-policy" className="hover:text-indigo-800 transition-colors">
+                        <a href={`${locale}/privacy`} className="hover:text-indigo-800 transition-colors">
                             Privacy Policy
                         </a>
                         <span>•</span>
-                        <a href="/terms-of-service" className="hover:text-indigo-800 transition-colors">
+                        <a href={`${locale}/terms`} className="hover:text-indigo-800 transition-colors">
                             Terms of Service
                         </a>
                     </div>

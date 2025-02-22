@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useTranslations } from "next-intl"
+import {useLocale, useTranslations} from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, GamepadIcon } from "lucide-react"
@@ -12,16 +12,16 @@ import { HelpDialog } from "./HelpDialog"
 const Header = () => {
     const t = useTranslations("Header")
     const [isOpen, setIsOpen] = useState(false)
+    const locale = useLocale()
 
     const menuItems = [
         { href: "/", label: t("home") },
-        { href: "/privacy", label: t("privacy") },
-        { href: "/terms", label: t("termsOfService") },
-        { href: "/about", label: t("about") },
+        { href: `${locale}/privacy`, label: t("privacy") },
+        { href: `${locale}/terms`, label: t("termsOfService") },
     ]
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 bg-transparent">
+        <header className="z-50 bg-transparent">
             <div className="container mx-auto px-4 py-4 flex justify-between items-center">
                 {/* Mobile Menu */}
                 <div className="lg:hidden">

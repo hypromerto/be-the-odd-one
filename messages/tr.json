@@ -59,7 +59,10 @@
     "point": "puan",
     "points": "puan",
     "noPoints": "Puan yok",
-    "firstToSubmit": "İlk cevaplayan!"
+    "firstToSubmit": "İlk cevaplayan!",
+    "voteToInvalidate": "Geçersiz Kılmak için Oy Ver",
+    "votesToInvalidate": "Geçersiz kılmak için oylar: ",
+    "votedToInvalidate": "Geçersiz kılmak için oy verenler"
   },
   "ThemeInput": {
     "enterThemes": "Temaları Girin",

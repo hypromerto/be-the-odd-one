@@ -351,7 +351,26 @@ export async function fetchRoomData(roomId: string): Promise<RoomState> {
         throw roomError
     }
 
-    // Transform the data to include player_name in answers, add empty answers for non-submitting players, and sort themes
+    // Fetch invalidation votes
+    const { data: invalidationVotes, error: votesError } = await supabase
+        .from("invalidation_votes")
+        .select("*")
+        .eq("room_id", roomId)
+
+    if (votesError) {
+        console.error("Error fetching invalidation votes:", votesError)
+        throw votesError
+    }
+
+    // Create a map of answer IDs to their invalidation votes
+    const voteMap = new Map()
+    invalidationVotes.forEach((vote) => {
+        if (!voteMap.has(vote.answer_id)) {
+            voteMap.set(vote.answer_id, [])
+        }
+        voteMap.get(vote.answer_id).push(vote.player_id)
+    })
+
     const transformedRoom = {
         ...room,
         themes: room.themes
@@ -369,6 +388,7 @@ export async function fetchRoomData(roomId: string): Promise<RoomState> {
                         answer: "",
                         invalid: true,
                         created_at: new Date().toISOString(),
+                        invalidation_votes: [],
                     }))
 
                 return {
@@ -377,6 +397,7 @@ export async function fetchRoomData(roomId: string): Promise<RoomState> {
                         ...themeAnswers.map((answer) => ({
                             ...answer,
                             player_name: answer.player.name,
+                            invalidation_votes: voteMap.get(answer.id) || [],
                         })),
                         ...emptyAnswers,
                     ],
@@ -437,6 +458,7 @@ export async function fetchAnswersForTheme(roomId: string, themeId: number): Pro
                 answer: submittedAnswer.answer,
                 invalid: submittedAnswer.invalid,
                 created_at: submittedAnswer.created_at,
+                invalidation_votes: [],
             }
         } else {
             return {
@@ -447,6 +469,7 @@ export async function fetchAnswersForTheme(roomId: string, themeId: number): Pro
                 answer: "",
                 invalid: true,
                 created_at: new Date().toISOString(),
+                invalidation_votes: [],
             }
         }
     })
@@ -549,5 +572,47 @@ export async function fetchPlayerScores(roomId: string) {
     }
 
     return players
+}
+
+export async function submitInvalidationVote(roomId: string, answerId: number, voterId: number, themeId: number) {
+    const supabase = await createClient()
+
+    // Check if the vote already exists
+    const { data: existingVote, error: checkError } = await supabase
+        .from("invalidation_votes")
+        .select("*")
+        .eq("room_id", roomId)
+        .eq("player_id", voterId)
+        .eq("answer_id", answerId)
+        .single()
+
+    if (checkError && checkError.code !== "PGRST116") {
+        // PGRST116 is the error code for no rows returned
+        console.error("Error checking existing vote:", checkError)
+        throw new Error("Failed to check existing vote")
+    }
+
+    if (existingVote) {
+        console.log("Vote already exists")
+        return existingVote
+    }
+
+    // If the vote doesn't exist, add it
+    const { data, error } = await supabase
+        .from("invalidation_votes")
+        .insert({
+            room_id: roomId,
+            player_id: voterId,
+            theme_id: themeId,
+            answer_id: answerId,
+        })
+        .select()
+
+    if (error) {
+        console.error("Error submitting invalidation vote:", error)
+        throw new Error("Failed to submit invalidation vote")
+    }
+
+    return data[0]
 }
 

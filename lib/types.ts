@@ -19,6 +19,7 @@ export interface Answer {
     answer: string
     invalid: boolean
     created_at: number
+    invalidation_votes: number[]
 }
 
 export interface Theme {

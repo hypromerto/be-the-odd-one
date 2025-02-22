@@ -111,7 +111,7 @@ export default function RoomContent({ roomId, currentUserId }: RoomContentProps)
                     )
                 )
             case "review":
-                return currentTheme && <AnswerReviewScreen roomId={roomId} theme={currentTheme} isHost={isHost} />
+                return currentTheme && <AnswerReviewScreen roomId={roomId} theme={currentTheme} isHost={isHost} currentPlayer={currentPlayer}/>
             case "game_over":
                 return (
                     <GameResults

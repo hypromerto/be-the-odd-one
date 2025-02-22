@@ -13,7 +13,7 @@ import {
     finishReview,
     resetGame,
     joinRoom,
-    markAnswerInvalid, setGameState, sendAllThemesSubmittedEvent,
+    markAnswerInvalid, setGameState, sendAllThemesSubmittedEvent, submitInvalidationVote,
 } from "@/app/actions"
 import { getCurrentUser, signInAnonymously } from "@/lib/client_auth"
 import type { Answer, Player, Theme } from "@/lib/types"
@@ -64,6 +64,7 @@ type Action =
     | { type: "THEMES_FETCHED"; payload: Theme[] }
     | { type: "NEXT_THEME_FETCHED"; payload: Theme }
     | { type: "TIMER_STARTED"; payload: { themeId: number, playerId: number } }
+    | { type: "VOTE_TO_INVALIDATE"; payload: { themeId: number, answerId: number; voterId: number } }
 
 // Reducer function
 function gameReducer(state: RoomState, action: Action): RoomState {
@@ -160,6 +161,21 @@ function gameReducer(state: RoomState, action: Action): RoomState {
                 timer_started: true,
                 first_submit_player_id: action.payload.playerId,
                 current_theme_id: action.payload.themeId,
+            }
+        case "VOTE_TO_INVALIDATE":
+            console.log("VOTE_TO_INVALIDATE", action.payload)
+            return {
+                ...state,
+                themes: state.themes.map((theme) =>
+                    theme.id === action.payload.themeId
+                        ? {
+                            ...theme,
+                            answers: theme.answers.map((answer) =>
+                                answer.id === action.payload.answerId ? { ...answer, invalidation_votes: [...answer.invalidation_votes, action.payload.voterId] } : answer,
+                            ),
+                        }
+                        : theme,
+                ),
             }
         default:
             return state
@@ -297,6 +313,9 @@ export const GameChannelProvider: React.FC<GameChannelProviderProps> = ({ childr
             })
             .on("broadcast", { event: "timer_started" }, ({ payload }) => {
                 dispatch({ type: "TIMER_STARTED", payload: { themeId: payload.themeId, playerId: payload.playerId }})
+            })
+            .on("broadcast", { event: "vote_to_invalidate" }, ({ payload }) => {
+                dispatch({ type: "VOTE_TO_INVALIDATE", payload: { themeId: payload.themeId, answerId: payload.answerId, voterId: payload.voterId } })
             })
             .subscribe((status) => {
                 console.log("Channel status:", status)
@@ -512,6 +531,35 @@ export const useExpireTimer = (roomId: string) => {
             await setGameState(roomId, "review")
         } catch (error) {
             console.error("Failed to expire timer:", error)
+        }
+    }
+}
+
+export const useVoteToInvalidate = (roomId: string) => {
+    const { dispatch, sendBroadcast } = useContext(GameChannelContext)
+    return async (themeId: number, answerId: number, playerId: number, shouldInvalidate: boolean) => {
+        try {
+            if (shouldInvalidate) {
+                // If this vote will make it the majority, invalidate the answer
+                dispatch({
+                    type: "ANSWER_INVALIDATED",
+                    payload: { answerId, themeId },
+                })
+                await sendBroadcast("answer_invalidated", { answerId, themeId })
+
+                // Also mark the answer as invalid in the database
+                await markAnswerInvalid(roomId, answerId)
+            } else {
+                // Otherwise, just add the vote
+                const newVote = await submitInvalidationVote(roomId, answerId, playerId, themeId)
+                dispatch({
+                    type: "VOTE_TO_INVALIDATE",
+                    payload: { themeId, answerId, voterId: playerId },
+                })
+                await sendBroadcast("vote_to_invalidate", { themeId, answerId, voterId: playerId })
+            }
+        } catch (error) {
+            console.error("Failed to vote for invalidation:", error)
         }
     }
 }

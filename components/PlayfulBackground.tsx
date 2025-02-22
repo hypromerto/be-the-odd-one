@@ -79,7 +79,7 @@ const PlayfulBackground = () => {
         }
 
         const leaves: Leaf[] = []
-        for (let i = 0; i < 15; i++) {
+        for (let i = 0; i < 30; i++) {
             leaves.push(new Leaf())
         }
 

@@ -57,7 +57,10 @@
     "point": "point",
     "points": "points",
     "noPoints": "No points",
-    "firstToSubmit": "First to answer!"
+    "firstToSubmit": "First to answer!",
+    "voteToInvalidate": "Vote to Invalidate",
+    "votesToInvalidate": "Votes to Invalidate: ",
+    "votedToInvalidate": "Voted to invalidate"
   },
   "ThemeInput": {
     "enterThemes": "Enter Themes",
@@ -185,6 +188,97 @@
   "RoundStartCountdown": {
     "roundStarting": "Round Starting",
     "getReady": "Get ready! The next round is about to begin..."
+  },
+  "PrivacyPolicy": {
+    "title": "Privacy Policy",
+    "introduction": {
+      "title": "Introduction",
+      "content": "This Privacy Policy describes how Be the Odd One ('we', 'our', or 'us') collects, uses, and shares your personal information when you use our website and play our game."
+    },
+    "informationCollection": {
+      "title": "Information We Collect",
+      "content": "We collect several types of information from and about users of our website, including:",
+      "items": {
+        "personal": "Personal information such as your name, email address, and IP address.",
+        "usage": "Usage data about how you interact with our game and website.",
+        "cookies": "Information collected through cookies and similar technologies."
+      }
+    },
+    "informationUse": {
+      "title": "How We Use Your Information",
+      "content": "We use the information we collect to operate and improve our website, personalize your experience, and communicate with you about our services."
+    },
+    "dataSharing": {
+      "title": "Sharing of Your Information",
+      "content": "We may share your information with third-party service providers, including Google AdSense, to help us operate our business and provide you with relevant advertisements."
+    },
+    "cookies": {
+      "title": "Cookies and Similar Technologies",
+      "content": "We use cookies and similar tracking technologies to track activity on our website and hold certain information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent."
+    },
+    "security": {
+      "title": "Data Security",
+      "content": "We have implemented measures designed to secure your personal information from accidental loss and from unauthorized access, use, alteration, and disclosure."
+    },
+    "changes": {
+      "title": "Changes to Our Privacy Policy",
+      "content": "We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "content": "If you have any questions about this Privacy Policy, please contact us at [Your Contact Information]."
+    }
+  },
+  "TermsOfService": {
+    "title": "Terms of Service",
+    "acceptance": {
+      "title": "Acceptance of Terms",
+      "content": "By accessing or using Be the Odd One, you agree to be bound by these Terms of Service."
+    },
+    "useOfService": {
+      "title": "Use of Service",
+      "content": "You agree to use our service only for lawful purposes and in accordance with these Terms of Service."
+    },
+    "userAccounts": {
+      "title": "User Accounts",
+      "content": "You are responsible for safeguarding the password you use to access the service and for any activities or actions under your password."
+    },
+    "intellectualProperty": {
+      "title": "Intellectual Property",
+      "content": "The service and its original content, features, and functionality are and will remain the exclusive property of Be the Odd One and its licensors."
+    },
+    "userContent": {
+      "title": "User-Generated Content",
+      "content": "You retain any and all of your rights to any content you submit, post or display on or through the service."
+    },
+    "prohibitedConduct": {
+      "title": "Prohibited Conduct",
+      "content": "You agree not to engage in any conduct that could damage, disable, overburden, or impair our servers or networks, or interfere with any other party's use and enjoyment of the service."
+    },
+    "termination": {
+      "title": "Termination",
+      "content": "We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms."
+    },
+    "disclaimer": {
+      "title": "Disclaimer",
+      "content": "Your use of the service is at your sole risk. The service is provided on an 'AS IS' and 'AS AVAILABLE' basis."
+    },
+    "limitationOfLiability": {
+      "title": "Limitation of Liability",
+      "content": "In no event shall Be the Odd One, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages."
+    },
+    "changes": {
+      "title": "Changes to Terms",
+      "content": "We reserve the right, at our sole discretion, to modify or replace these Terms at any time."
+    },
+    "governingLaw": {
+      "title": "Governing Law",
+      "content": "These Terms shall be governed and construed in accordance with the laws of [Your Country/State], without regard to its conflict of law provisions."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "content": "If you have any questions about these Terms, please contact us at [Your Contact Information]."
+    }
   }
 }
 

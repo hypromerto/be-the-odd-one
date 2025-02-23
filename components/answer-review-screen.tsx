@@ -195,7 +195,7 @@ export default function AnswerReviewScreen({ roomId, theme, isHost, currentPlaye
                                                         {canBeInvalidated && (
                                                             <>
                                                                 {answer.invalidation_votes.length > 0 && (
-                                                                    <span className="text-xs font-medium text-red-500">
+                                                                    <span className="text-base font-medium text-red-500">
                                     {answer.invalidation_votes.length}
                                   </span>
                                                                 )}

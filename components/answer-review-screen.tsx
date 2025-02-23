@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Info, Zap, ThumbsDown } from "lucide-react"
+import { Info, Zap, ThumbsDown, X } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import type { Theme, Answer, Player } from "@/lib/types"
@@ -41,18 +41,17 @@ export default function AnswerReviewScreen({ roomId, theme, isHost, currentPlaye
 
     const handleVoteToInvalidate = async (answer: Answer) => {
         try {
-            let shouldInvalidate = false
-            const currentVotes = answer.invalidation_votes.length
-            const totalPlayers = gameState.players.length
-            const votesNeededToInvalidate = Math.ceil(totalPlayers / 2)
-
-            if (currentVotes + 1 >= votesNeededToInvalidate) {
-                shouldInvalidate = true
-            }
-
-            await voteToInvalidate(theme.id, answer.id, currentPlayer.id, shouldInvalidate)
+            await voteToInvalidate(theme.id, answer.id, currentPlayer.id, false)
         } catch (error) {
             console.error("Failed to vote for invalidation:", error)
+        }
+    }
+
+    const handleHostInvalidate = async (answerId: number) => {
+        try {
+            await markAnswerAsInvalid(answerId, theme.id)
+        } catch (error) {
+            console.error("Failed to invalidate answer:", error)
         }
     }
 
@@ -195,16 +194,21 @@ export default function AnswerReviewScreen({ roomId, theme, isHost, currentPlaye
                                                     <div className="flex items-center space-x-2">
                                                         {canBeInvalidated && (
                                                             <>
-                                <span
-                                    className={`text-xs font-medium ${
-                                        answer.invalidation_votes.length > 0 ? "text-red-500" : "text-gray-400"
-                                    }`}
-                                >
-                                    {t("votesToInvalidate")}
-                                  {answer.invalidation_votes.length}/{Math.ceil(gameState.players.length / 2)}
-                                </span>
+                                                                {answer.invalidation_votes.length > 0 && (
+                                                                    <span className="text-xs font-medium text-red-500">
+                                    {answer.invalidation_votes.length}
+                                  </span>
+                                                                )}
                                                                 <div className="h-10 w-10 flex items-center justify-center">
-                                                                    {answer.invalidation_votes.includes(currentPlayer.id) ? (
+                                                                    {isHost ? (
+                                                                        <Button
+                                                                            onClick={() => handleHostInvalidate(answer.id)}
+                                                                            className="h-10 w-10 p-0 rounded-full bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+                                                                        >
+                                                                            <span className="sr-only">{t("invalidateAnswer")}</span>
+                                                                            <X className="w-6 h-6" />
+                                                                        </Button>
+                                                                    ) : answer.invalidation_votes.includes(currentPlayer.id) ? (
                                                                         <ThumbsDown className="w-6 h-6 text-red-500" />
                                                                     ) : (
                                                                         <Button

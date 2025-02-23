@@ -539,25 +539,12 @@ export const useVoteToInvalidate = (roomId: string) => {
     const { dispatch, sendBroadcast } = useContext(GameChannelContext)
     return async (themeId: number, answerId: number, playerId: number, shouldInvalidate: boolean) => {
         try {
-            if (shouldInvalidate) {
-                // If this vote will make it the majority, invalidate the answer
-                dispatch({
-                    type: "ANSWER_INVALIDATED",
-                    payload: { answerId, themeId },
-                })
-                await sendBroadcast("answer_invalidated", { answerId, themeId })
-
-                // Also mark the answer as invalid in the database
-                await markAnswerInvalid(roomId, answerId)
-            } else {
-                // Otherwise, just add the vote
-                const newVote = await submitInvalidationVote(roomId, answerId, playerId, themeId)
-                dispatch({
-                    type: "VOTE_TO_INVALIDATE",
-                    payload: { themeId, answerId, voterId: playerId },
-                })
-                await sendBroadcast("vote_to_invalidate", { themeId, answerId, voterId: playerId })
-            }
+            const newVote = await submitInvalidationVote(roomId, answerId, playerId, themeId)
+            dispatch({
+                type: "VOTE_TO_INVALIDATE",
+                payload: { themeId, answerId, voterId: playerId },
+            })
+            await sendBroadcast("vote_to_invalidate", { themeId, answerId, voterId: playerId })
         } catch (error) {
             console.error("Failed to vote for invalidation:", error)
         }

@@ -45,7 +45,7 @@ export default async function RootLayout({
         <PlayfulBackground />
         <NextIntlClientProvider locale={locale} messages={messages}>
             <Header />
-            <main className="flex-grow relative grid">{children}</main>
+            <main className="flex-grow relative grid max-sm:-mt-6">{children}</main>
             <footer className="hidden lg:block py-4 text-center text-sm text-indigo-600/80 backdrop-blur-sm">
                 <div className="container mx-auto">
                     <div className="space-x-4">

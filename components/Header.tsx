@@ -8,6 +8,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu, GamepadIcon } from "lucide-react"
 import LanguageSwitcher from "./LanguageSwitcher"
 import { HelpDialog } from "./HelpDialog"
+import {getFullUrl} from "@/utils/url";
 
 const Header = () => {
     const t = useTranslations("Header")
@@ -16,8 +17,8 @@ const Header = () => {
 
     const menuItems = [
         { href: "/", label: t("home") },
-        { href: `${locale}/privacy`, label: t("privacy") },
-        { href: `${locale}/terms`, label: t("termsOfService") },
+        { href: `/privacy`, label: t("privacy") },
+        { href: `/terms`, label: t("termsOfService") },
     ]
 
     return (
@@ -36,7 +37,7 @@ const Header = () => {
                                 {menuItems.map((item) => (
                                     <Link
                                         key={item.href}
-                                        href={item.href}
+                                        href={getFullUrl(item.href, locale)}
                                         className="text-lg font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
                                         onClick={() => setIsOpen(false)}
                                     >

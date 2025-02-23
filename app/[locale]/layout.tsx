@@ -10,6 +10,7 @@ import { GoogleAnalytics } from "@next/third-parties/google"
 import { Toaster } from "@/components/ui/toaster"
 import Header from "@/components/Header"
 import PlayfulBackground from "@/components/PlayfulBackground"
+import {getFullUrl} from "@/utils/url";
 
 const inter = Inter({ subsets: ["latin"] })
 const AdsenseId = process.env.NEXT_PUBLIC_ADSENSE_ID
@@ -48,11 +49,11 @@ export default async function RootLayout({
             <footer className="hidden lg:block py-4 text-center text-sm text-indigo-600/80 backdrop-blur-sm">
                 <div className="container mx-auto">
                     <div className="space-x-4">
-                        <a href={`${locale}/privacy`} className="hover:text-indigo-800 transition-colors">
+                        <a href={getFullUrl(`/privacy`, locale)} className="hover:text-indigo-800 transition-colors">
                             Privacy Policy
                         </a>
                         <span>•</span>
-                        <a href={`${locale}/terms`} className="hover:text-indigo-800 transition-colors">
+                        <a href={getFullUrl(`/terms`, locale)} className="hover:text-indigo-800 transition-colors">
                             Terms of Service
                         </a>
                     </div>

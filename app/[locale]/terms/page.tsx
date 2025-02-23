@@ -1,68 +1,84 @@
 import { useTranslations } from "next-intl"
-import PlayfulBackground from "@/components/PlayfulBackground"
-import Header from "@/components/Header"
-import Footer from "@/components/Footer"
+import { Card, CardContent } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
+import {
+    Shield,
+    Users,
+    Code,
+    MessageSquare,
+    Ban,
+    Power,
+    AlertTriangle,
+    Scale,
+    Pencil,
+    Book,
+    Mail,
+    Info,
+    CheckCircle,
+    Gavel,
+} from "lucide-react"
+
+const Section = ({ title, content, icon: Icon }) => (
+    <div className="mb-6">
+        <h2 className="text-2xl font-semibold mb-2 flex items-center">
+            <Icon className="w-6 h-6 mr-2 text-indigo-500" />
+            {title}
+        </h2>
+        <p className="text-gray-700 dark:text-gray-300">{content}</p>
+    </div>
+)
 
 export default function TermsOfService() {
     const t = useTranslations("TermsOfService")
 
     return (
         <div className="min-h-screen flex flex-col">
-            <PlayfulBackground />
             <main className="flex-grow container mx-auto px-4 py-8 relative z-10">
-                <div className="bg-card/80 backdrop-blur-sm rounded-lg shadow-lg p-6">
-                    <h1 className="text-3xl font-bold mb-6">{t("title")}</h1>
-                    <div className="space-y-4">
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-2">{t("acceptance.title")}</h2>
-                            <p>{t("acceptance.content")}</p>
-                        </section>
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-2">{t("useOfService.title")}</h2>
-                            <p>{t("useOfService.content")}</p>
-                        </section>
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-2">{t("userAccounts.title")}</h2>
-                            <p>{t("userAccounts.content")}</p>
-                        </section>
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-2">{t("intellectualProperty.title")}</h2>
-                            <p>{t("intellectualProperty.content")}</p>
-                        </section>
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-2">{t("userContent.title")}</h2>
-                            <p>{t("userContent.content")}</p>
-                        </section>
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-2">{t("prohibitedConduct.title")}</h2>
-                            <p>{t("prohibitedConduct.content")}</p>
-                        </section>
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-2">{t("termination.title")}</h2>
-                            <p>{t("termination.content")}</p>
-                        </section>
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-2">{t("disclaimer.title")}</h2>
-                            <p>{t("disclaimer.content")}</p>
-                        </section>
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-2">{t("limitationOfLiability.title")}</h2>
-                            <p>{t("limitationOfLiability.content")}</p>
-                        </section>
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-2">{t("changes.title")}</h2>
-                            <p>{t("changes.content")}</p>
-                        </section>
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-2">{t("governingLaw.title")}</h2>
-                            <p>{t("governingLaw.content")}</p>
-                        </section>
-                        <section>
-                            <h2 className="text-2xl font-semibold mb-2">{t("contact.title")}</h2>
-                            <p>{t("contact.content")}</p>
-                        </section>
-                    </div>
-                </div>
+                <Card className="backdrop-blur-md bg-white/30 border-indigo-200/30 shadow-xl">
+                    <CardContent className="p-6">
+                        <h1 className="text-3xl font-bold mb-6 text-center text-indigo-900 dark:text-indigo-100">{t("title")}</h1>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-6 text-center">{t("lastUpdated")}</p>
+
+                        <Section title={t("introduction.title")} content={t("introduction.content")} icon={Info} />
+                        <Separator className="my-4" />
+
+                        <Section title={t("acceptance.title")} content={t("acceptance.content")} icon={CheckCircle} />
+                        <Separator className="my-4" />
+
+                        <Section title={t("useOfService.title")} content={t("useOfService.content")} icon={Shield} />
+                        <Separator className="my-4" />
+
+                        <Section title={t("userAccounts.title")} content={t("userAccounts.content")} icon={Users} />
+                        <Separator className="my-4" />
+
+                        <Section title={t("userContent.title")} content={t("userContent.content")} icon={MessageSquare} />
+                        <Separator className="my-4" />
+
+                        <Section title={t("intellectualProperty.title")} content={t("intellectualProperty.content")} icon={Code} />
+                        <Separator className="my-4" />
+
+                        <Section title={t("prohibitedConduct.title")} content={t("prohibitedConduct.content")} icon={Ban} />
+                        <Separator className="my-4" />
+
+                        <Section title={t("termination.title")} content={t("termination.content")} icon={Power} />
+                        <Separator className="my-4" />
+
+                        <Section title={t("disclaimer.title")} content={t("disclaimer.content")} icon={AlertTriangle} />
+                        <Separator className="my-4" />
+
+                        <Section
+                            title={t("limitationOfLiability.title")}
+                            content={t("limitationOfLiability.content")}
+                            icon={Scale}
+                        />
+                        <Separator className="my-4" />
+
+                        <Section title={t("changes.title")} content={t("changes.content")} icon={Pencil} />
+                        <Separator className="my-4" />
+
+                        <Section title={t("contact.title")} content={t("contact.content")} icon={Mail} />
+                    </CardContent>
+                </Card>
             </main>
         </div>
     )

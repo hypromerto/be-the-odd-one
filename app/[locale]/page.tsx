@@ -10,7 +10,8 @@ import AnimatedContent from "@/components/animated-content"
 import { isRedirectError } from "next/dist/client/components/redirect"
 import Script from "next/script"
 import { useTranslations } from "next-intl"
-import {useRouter} from "@/i18n/routing";
+import { useRouter } from "@/i18n/routing"
+import { Lightbulb, PackageOpen, PenTool, Users } from "lucide-react"
 
 const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY
 
@@ -72,25 +73,34 @@ export default function HomePage() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <div className="min-h-auto flex flex-col items-center justify-center p-4">
             <Script src={`https://www.google.com/recaptcha/api.js?render=${SITE_KEY}`} />
             <AnimatedContent>
-                <Card className="w-full backdrop-blur-sm  shadow-xl">
+                <Card className="w-full max-w-2xl backdrop-blur-sm shadow-xl">
                     <CardHeader>
                         <CardTitle className="text-3xl font-bold text-center text-indigo-800">{t("gameName")}</CardTitle>
                         <CardDescription className="text-center text-indigo-600">{t("gameDescription")}</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <div className="space-y-6">
-                            <div className="space-y-2">
-                                <p className="text-sm text-gray-600">{t("howToPlay")}</p>
-                                <div className="bg-amber-100 p-4 rounded-lg">
-                                    <ol className="list-decimal list-inside text-sm text-gray-700 space-y-1">
-                                        <li>{t("howToPlaySteps.1")}</li>
-                                        <li>{t("howToPlaySteps.2")}</li>
-                                        <li>{t("howToPlaySteps.3")}</li>
-                                        <li>{t("howToPlaySteps.4")}</li>
-                                    </ol>
+                            <div className="space-y-4">
+                                <h3 className="text-lg font-semibold text-indigo-800">{t("aboutTheGame")}</h3>
+                                <p className="text-sm text-gray-700">{t("gameExplanation")}</p>
+
+                                <h3 className="text-lg font-semibold text-indigo-800">{t("howToPlay")}</h3>
+                                <div className="bg-amber-100 p-4 rounded-lg space-y-3">
+                                    <div className="flex items-start space-x-3">
+                                        <PackageOpen className="w-5 h-5 text-indigo-600 mt-1 flex-shrink-0" />
+                                        <p className="text-sm text-gray-700">{t("howToPlaySteps.setup")}</p>
+                                    </div>
+                                    <div className="flex items-start space-x-3">
+                                        <Lightbulb className="w-5 h-5 text-indigo-600 mt-1 flex-shrink-0" />
+                                        <p className="text-sm text-gray-700">{t("howToPlaySteps.answering")}</p>
+                                    </div>
+                                    <div className="flex items-start space-x-3">
+                                        <PenTool className="w-5 h-5 text-indigo-600 mt-1 flex-shrink-0" />
+                                        <p className="text-sm text-gray-700">{t("howToPlaySteps.scoring")}</p>
+                                    </div>
                                 </div>
                             </div>
 

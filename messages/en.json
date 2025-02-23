@@ -1,13 +1,6 @@
 {
   "gameName": "Be the Odd One",
   "gameDescription": "Stand out with your unique answers!",
-  "howToPlay": "How to Play:",
-  "howToPlaySteps": {
-    "1": "Players take turns submitting themes.",
-    "2": "Everyone races to come up with unique answers for each theme.",
-    "3": "Earn points by being the odd one out!",
-    "4": "At least 3 players are required to start a game."
-  },
   "createRoom": "Create Room",
   "joinRoom": "Join Room",
   "enterName": "Enter your name",
@@ -191,6 +184,7 @@
   },
   "PrivacyPolicy": {
     "title": "Privacy Policy",
+    "lastUpdated": "Last Updated: February 23, 2024",
     "introduction": {
       "title": "Introduction",
       "content": "This Privacy Policy describes how Be the Odd One ('we', 'our', or 'us') collects, uses, and shares your personal information when you use our website and play our game."
@@ -199,86 +193,117 @@
       "title": "Information We Collect",
       "content": "We collect several types of information from and about users of our website, including:",
       "items": {
-        "personal": "Personal information such as your name, email address, and IP address.",
+        "personal": "Personal information that you provide to us, such as your name and email address.",
         "usage": "Usage data about how you interact with our game and website.",
-        "cookies": "Information collected through cookies and similar technologies."
+        "device": "Device and browser information, including your IP address, browser type, and operating system.",
+        "cookies": "Information collected through cookies and similar tracking technologies."
       }
     },
-    "informationUse": {
+    "cookies": {
+      "title": "Cookies and Advertising",
+      "content": "We use cookies and similar tracking technologies to track activity on our website and hold certain information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent.",
+      "advertising": "We may use third-party advertising services on our website. These services may use cookies and similar technologies to serve ads based on your prior visits to our website or other websites.",
+      "thirdPartyVendors": "Third-party vendors may use cookies to serve ads based on your prior visits to our website and other websites on the Internet.",
+      "personalization": "The use of advertising cookies enables our advertising partners to serve ads that may be relevant to you based on your browsing behavior.",
+      "optOut": "You may opt out of personalized advertising by visiting www.aboutads.info or the Network Advertising Initiative's opt-out page at www.networkadvertising.org/choices/."
+    },
+    "dataUse": {
       "title": "How We Use Your Information",
-      "content": "We use the information we collect to operate and improve our website, personalize your experience, and communicate with you about our services."
+      "content": "We use the information we collect to:",
+      "items": {
+        "operation": "Operate and improve our website and game",
+        "personalization": "Personalize your gaming experience",
+        "communication": "Communicate with you about our services",
+        "advertising": "Deliver relevant advertising to you",
+        "analytics": "Analyze how our website and game are used"
+      }
     },
     "dataSharing": {
-      "title": "Sharing of Your Information",
-      "content": "We may share your information with third-party service providers, including Google AdSense, to help us operate our business and provide you with relevant advertisements."
-    },
-    "cookies": {
-      "title": "Cookies and Similar Technologies",
-      "content": "We use cookies and similar tracking technologies to track activity on our website and hold certain information. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent."
+      "title": "Information Sharing",
+      "content": "We may share your information with:",
+      "items": {
+        "serviceProviders": "Third-party service providers who assist us in operating our website and providing our services",
+        "advertising": "Advertising partners who help us deliver relevant advertisements",
+        "legal": "Law enforcement or others if required by law",
+        "business": "Business partners in the event of a corporate sale, merger, or acquisition"
+      }
     },
     "security": {
       "title": "Data Security",
-      "content": "We have implemented measures designed to secure your personal information from accidental loss and from unauthorized access, use, alteration, and disclosure."
+      "content": "We have implemented appropriate technical and organizational security measures designed to protect the security of any personal information we process."
+    },
+    "childPrivacy": {
+      "title": "Children's Privacy",
+      "content": "Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from anyone under the age of 13."
     },
     "changes": {
-      "title": "Changes to Our Privacy Policy",
-      "content": "We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page."
+      "title": "Changes to This Privacy Policy",
+      "content": "We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the 'Last Updated' date."
     },
     "contact": {
       "title": "Contact Us",
-      "content": "If you have any questions about this Privacy Policy, please contact us at [Your Contact Information]."
+      "content": "If you have any questions about this Privacy Policy, please contact us at mertaslan16@gmail.com"
     }
   },
   "TermsOfService": {
     "title": "Terms of Service",
+    "lastUpdated": "Last Updated: February 23, 2024",
+    "introduction": {
+      "title": "Introduction",
+      "content": "Welcome to Be the Odd One. These Terms of Service ('Terms') govern your use of our website ('Site') and game ('Game'). By accessing or using our Site or Game, you agree to be bound by these Terms. If you disagree with any part of the Terms, you may not access the Site or use our Game."
+    },
     "acceptance": {
       "title": "Acceptance of Terms",
-      "content": "By accessing or using Be the Odd One, you agree to be bound by these Terms of Service."
+      "content": "By creating an account or using our services, you confirm that you are at least 13 years old and that you understand and agree to these Terms. If you are under 18, you confirm that you have your parent's or legal guardian's permission to use the Site and Game."
     },
     "useOfService": {
       "title": "Use of Service",
-      "content": "You agree to use our service only for lawful purposes and in accordance with these Terms of Service."
+      "content": "You agree to use our Site and Game only for lawful purposes and in accordance with these Terms. You must not use our services for any illegal or unauthorized purpose, including but not limited to violating any intellectual property rights, privacy rights, or other rights of any person or entity."
     },
     "userAccounts": {
       "title": "User Accounts",
-      "content": "You are responsible for safeguarding the password you use to access the service and for any activities or actions under your password."
+      "content": "To access certain features, you may need to create an account. You are responsible for maintaining the confidentiality of your account information and for all activities that occur under your account. You agree to notify us immediately of any unauthorized use of your account."
+    },
+    "userContent": {
+      "title": "User Content",
+      "content": "By submitting any content to our Site or Game, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, modify, adapt, publish, translate, and distribute that content. You represent and warrant that you own or have the necessary rights to the content you submit."
     },
     "intellectualProperty": {
       "title": "Intellectual Property",
-      "content": "The service and its original content, features, and functionality are and will remain the exclusive property of Be the Odd One and its licensors."
-    },
-    "userContent": {
-      "title": "User-Generated Content",
-      "content": "You retain any and all of your rights to any content you submit, post or display on or through the service."
+      "content": "The Site and Game, including their content, features, and functionality, are owned by us and are protected by copyright, trademark, and other intellectual property laws. You may not copy, modify, create derivative works, publicly display, sell, or exploit any of our content without our express written consent."
     },
     "prohibitedConduct": {
       "title": "Prohibited Conduct",
-      "content": "You agree not to engage in any conduct that could damage, disable, overburden, or impair our servers or networks, or interfere with any other party's use and enjoyment of the service."
+      "content": "You agree not to: (a) use our Site or Game in any unlawful manner, (b) harass, bully, or abuse other users, (c) transmit any harmful code or viruses, (d) attempt to gain unauthorized access to our systems, (e) interfere with the proper working of our Site or Game, or (f) create multiple accounts for abusive purposes."
     },
     "termination": {
       "title": "Termination",
-      "content": "We may terminate or suspend your account immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms."
+      "content": "We reserve the right to terminate or suspend your access to our services at any time, without prior notice or liability, for any reason, including, without limitation, if you breach these Terms. Upon termination, your right to use the Site and Game will immediately cease."
     },
     "disclaimer": {
       "title": "Disclaimer",
-      "content": "Your use of the service is at your sole risk. The service is provided on an 'AS IS' and 'AS AVAILABLE' basis."
+      "content": "Our Site and Game are provided on an 'as is' and 'as available' basis. We do not warrant that our services will be uninterrupted, timely, secure, or error-free. We make no warranties regarding the accuracy, reliability, or quality of any information, content, or materials provided through the Site or Game."
     },
     "limitationOfLiability": {
       "title": "Limitation of Liability",
-      "content": "In no event shall Be the Odd One, nor its directors, employees, partners, agents, suppliers, or affiliates, be liable for any indirect, incidental, special, consequential or punitive damages."
+      "content": "To the maximum extent permitted by law, in no event will we be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or relating to your use of our Site or Game. Our total liability for any claims relating to the Site or Game shall not exceed the amount you paid to us, if any, in the past twelve months."
     },
     "changes": {
       "title": "Changes to Terms",
-      "content": "We reserve the right, at our sole discretion, to modify or replace these Terms at any time."
-    },
-    "governingLaw": {
-      "title": "Governing Law",
-      "content": "These Terms shall be governed and construed in accordance with the laws of [Your Country/State], without regard to its conflict of law provisions."
+      "content": "We reserve the right to modify these Terms at any time. We will provide notice of significant changes by posting an announcement on our Site or sending you an email. Your continued use of the Site or Game after such modifications constitutes your acceptance of the new Terms."
     },
     "contact": {
       "title": "Contact Us",
-      "content": "If you have any questions about these Terms, please contact us at [Your Contact Information]."
+      "content": "If you have any questions about these Terms, please contact us at mertaslan16@gmail.com."
     }
+  },
+  "aboutTheGame": "About the Game",
+  "gameExplanation": "Be the Odd One is a creative party game where players compete to come up with the most unique answers to given themes.",
+  "howToPlay": "How to Play",
+  "howToPlaySteps": {
+    "setup": "Setup: Join a room with friends or create your own. Choose from existing theme packs or create your own custom themes.",
+    "answering": "Answering: Each round, a theme is presented. Players submit their most unique answer related to the theme.",
+    "scoring": "Scoring: Only unique answers earn points. The player with the most points at the end wins!"
   }
 }
 

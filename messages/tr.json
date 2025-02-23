@@ -1,13 +1,6 @@
 {
   "gameName": "Be the Odd One",
   "gameDescription": "Benzersiz cevaplarınla öne çık!",
-  "howToPlay": "Nasıl Oynanır:",
-  "howToPlaySteps": {
-    "1": "Oyuncular sırayla tema belirler.",
-    "2": "Herkes her tema için benzersiz cevaplar bulmak için yarışır.",
-    "3": "Farklı olan cevabı vererek puan kazan!",
-    "4": "Oyunu başlatmak için en az 3 oyuncu gereklidir."
-  },
   "createRoom": "Oda Oluştur",
   "joinRoom": "Odaya Katıl",
   "enterName": "Adınızı girin",
@@ -187,6 +180,129 @@
   "RoundStartCountdown": {
     "roundStarting": "Tur Başlıyor",
     "getReady": "Hazır olun! Bir sonraki tur başlamak üzere..."
+  },
+  "PrivacyPolicy": {
+    "title": "Gizlilik Politikası",
+    "lastUpdated": "Son Güncelleme: 23 Şubat 2024",
+    "introduction": {
+      "title": "Giriş",
+      "content": "Bu Gizlilik Politikası, Be the Odd One ('biz', 'bizim' veya 'bize') olarak web sitemizi kullandığınızda ve oyunumuzu oynadığınızda kişisel bilgilerinizi nasıl topladığımızı, kullandığımızı ve paylaştığımızı açıklar."
+    },
+    "informationCollection": {
+      "title": "Topladığımız Bilgiler",
+      "content": "Web sitemizin kullanıcılarından çeşitli türde bilgiler topluyoruz:",
+      "items": {
+        "personal": "Bize sağladığınız isim ve e-posta adresi gibi kişisel bilgiler.",
+        "usage": "Oyunumuz ve web sitemizle nasıl etkileşimde bulunduğunuza dair kullanım verileri.",
+        "device": "IP adresiniz, tarayıcı türünüz ve işletim sisteminiz dahil olmak üzere cihaz ve tarayıcı bilgileri.",
+        "cookies": "Çerezler ve benzer izleme teknolojileri aracılığıyla toplanan bilgiler."
+      }
+    },
+    "cookies": {
+      "title": "Çerezler ve Reklam",
+      "content": "Web sitemizdeki aktiviteyi takip etmek ve belirli bilgileri tutmak için çerezler ve benzer izleme teknolojileri kullanıyoruz. Tarayıcınızı tüm çerezleri reddetmek veya bir çerez gönderildiğinde belirtmek üzere ayarlayabilirsiniz.",
+      "advertising": "Web sitemizde üçüncü taraf reklam hizmetleri kullanabiliriz. Bu hizmetler, web sitemize veya diğer web sitelerine önceki ziyaretlerinize dayalı olarak reklam sunmak için çerezler ve benzer teknolojiler kullanabilir.",
+      "thirdPartyVendors": "Üçüncü taraf satıcılar, web sitemize ve İnternet'teki diğer web sitelerine önceki ziyaretlerinize dayalı olarak reklam sunmak için çerezler kullanabilir.",
+      "personalization": "Reklam çerezlerinin kullanılması, reklam ortaklarımızın gezinme davranışınıza göre size alakalı olabilecek reklamlar sunmasını sağlar.",
+      "optOut": "www.aboutads.info adresini veya Network Advertising Initiative'in www.networkadvertising.org/choices/ adresindeki çıkış sayfasını ziyaret ederek kişiselleştirilmiş reklamları devre dışı bırakabilirsiniz."
+    },
+    "dataUse": {
+      "title": "Bilgilerinizi Nasıl Kullanıyoruz",
+      "content": "Topladığımız bilgileri şu amaçlarla kullanıyoruz:",
+      "items": {
+        "operation": "Web sitemizi ve oyunumuzu işletmek ve geliştirmek",
+        "personalization": "Oyun deneyiminizi kişiselleştirmek",
+        "communication": "Hizmetlerimiz hakkında sizinle iletişim kurmak",
+        "advertising": "Size alakalı reklamlar sunmak",
+        "analytics": "Web sitemizin ve oyunumuzun nasıl kullanıldığını analiz etmek"
+      }
+    },
+    "dataSharing": {
+      "title": "Bilgi Paylaşımı",
+      "content": "Bilgilerinizi şu taraflarla paylaşabiliriz:",
+      "items": {
+        "serviceProviders": "Web sitemizi işletmemize ve hizmetlerimizi sunmamıza yardımcı olan üçüncü taraf hizmet sağlayıcıları",
+        "advertising": "İlgili reklamları sunmamıza yardımcı olan reklam ortakları",
+        "legal": "Yasal olarak gerekli olduğunda kolluk kuvvetleri veya diğerleri",
+        "business": "Kurumsal satış, birleşme veya devralma durumunda iş ortakları"
+      }
+    },
+    "security": {
+      "title": "Veri Güvenliği",
+      "content": "İşlediğimiz kişisel bilgilerin güvenliğini korumak için uygun teknik ve organizasyonel güvenlik önlemleri uyguladık."
+    },
+    "childPrivacy": {
+      "title": "Çocukların Gizliliği",
+      "content": "Hizmetimiz 13 yaşın altındaki kişilere yönelik değildir. 13 yaşın altındaki kişilerden bilerek kişisel olarak tanımlanabilir bilgi toplamıyoruz."
+    },
+    "changes": {
+      "title": "Bu Gizlilik Politikasındaki Değişiklikler",
+      "content": "Gizlilik Politikamızı zaman zaman güncelleyebiliriz. Herhangi bir değişikliği, yeni Gizlilik Politikasını bu sayfada yayınlayarak ve 'Son Güncelleme' tarihini güncelleyerek size bildireceğiz."
+    },
+    "contact": {
+      "title": "Bize Ulaşın",
+      "content": "Bu Gizlilik Politikası hakkında herhangi bir sorunuz varsa, lütfen mertaslan16@gmail.com adresinden bizimle iletişime geçin."
+    }
+  },
+  "aboutTheGame": "Oyun Hakkında",
+  "gameExplanation": "Be the Odd One, oyuncuların verilen temalara en benzersiz cevapları bulmak için yarıştığı yaratıcı bir parti oyunudur.",
+  "howToPlay": "Nasıl Oynanır",
+  "howToPlaySteps": {
+    "setup": "Hazırlık: Arkadaşlarınızla bir odaya katılın veya kendi odanızı oluşturun. Mevcut tema paketlerinden seçin veya kendi özel temalarınızı oluşturun. ",
+    "answering": "Cevaplama: Her turda bir tema sunulur. Oyuncular temayla ilgili en benzersiz cevabı sunmaya çalışır.",
+    "scoring": "Puanlama: Cevabınız benzersiz ise puan kazanırsınız. Sonunda en çok puana sahip oyuncu kazanır!"
+  },
+  "TermsOfService": {
+    "title": "Kullanım Şartları",
+    "lastUpdated": "Son Güncelleme: 23 Şubat 2024",
+    "introduction": {
+      "title": "Giriş",
+      "content": "Be the Odd One'a hoş geldiniz. Bu Kullanım Şartları ('Şartlar'), web sitemizi ('Site') ve oyunumuzu ('Oyun') kullanımınızı düzenler. Sitemize erişerek veya Oyunumuzu kullanarak, bu Şartlara bağlı kalmayı kabul etmiş olursunuz. Şartların herhangi bir kısmına katılmıyorsanız, Siteye erişemez veya Oyunumuzu kullanamazsınız."
+    },
+    "acceptance": {
+      "title": "Şartların Kabulü",
+      "content": "Bir hesap oluşturarak veya hizmetlerimizi kullanarak, en az 13 yaşında olduğunuzu ve bu Şartları anladığınızı ve kabul ettiğinizi onaylarsınız. 18 yaşın altındaysanız, Siteyi ve Oyunu kullanmak için ebeveynlerinizin veya yasal vasinizin iznine sahip olduğunuzu onaylarsınız."
+    },
+    "useOfService": {
+      "title": "Hizmet Kullanımı",
+      "content": "Sitemizi ve Oyunumuzu yalnızca yasal amaçlar için ve bu Şartlara uygun olarak kullanmayı kabul ediyorsunuz. Hizmetlerimizi, herhangi bir kişi veya kuruluşun fikri mülkiyet haklarını, gizlilik haklarını veya diğer haklarını ihlal etmek de dahil olmak üzere, yasadışı veya yetkisiz herhangi bir amaç için kullanmamalısınız."
+    },
+    "userAccounts": {
+      "title": "Kullanıcı Hesapları",
+      "content": "Belirli özelliklere erişmek için bir hesap oluşturmanız gerekebilir. Hesap bilgilerinizin gizliliğini korumaktan ve hesabınız altında gerçekleşen tüm etkinliklerden siz sorumlusunuz. Hesabınızın yetkisiz kullanımını derhal bize bildirmeyi kabul ediyorsunuz."
+    },
+    "userContent": {
+      "title": "Kullanıcı İçeriği",
+      "content": "Sitemize veya Oyunumuza herhangi bir içerik göndererek, bize bu içeriği kullanma, çoğaltma, değiştirme, uyarlama, yayınlama, tercüme etme ve dağıtma konusunda dünya çapında, münhasır olmayan, telifsiz bir lisans vermiş olursunuz. Gönderdiğiniz içeriğe sahip olduğunuzu veya gerekli haklara sahip olduğunuzu beyan ve garanti edersiniz."
+    },
+    "intellectualProperty": {
+      "title": "Fikri Mülkiyet",
+      "content": "Site ve Oyun, içeriği, özellikleri ve işlevselliği dahil olmak üzere bizim mülkiyetimizdir ve telif hakkı, ticari marka ve diğer fikri mülkiyet yasaları tarafından korunmaktadır. İçeriğimizi açık yazılı iznimiz olmadan kopyalayamaz, değiştiremez, türev çalışmalar oluşturamaz, halka açık şekilde gösteremez, satamaz veya kullanamazsınız."
+    },
+    "prohibitedConduct": {
+      "title": "Yasaklı Davranışlar",
+      "content": "Şunları yapmamayı kabul ediyorsunuz: (a) Sitemizi veya Oyunumuzu yasadışı bir şekilde kullanmak, (b) diğer kullanıcıları taciz etmek, zorbalık yapmak veya kötüye kullanmak, (c) zararlı kod veya virüs yaymak, (d) sistemlerimize yetkisiz erişim sağlamaya çalışmak, (e) Sitemizin veya Oyunumuzun düzgün çalışmasını engellemek veya (f) kötüye kullanım amaçlı birden fazla hesap oluşturmak."
+    },
+    "termination": {
+      "title": "Fesih",
+      "content": "Herhangi bir zamanda, önceden bildirimde bulunmaksızın veya sorumluluk almaksızın, herhangi bir nedenle, bu Şartları ihlal etmeniz de dahil olmak üzere, hizmetlerimize erişiminizi sonlandırma veya askıya alma hakkını saklı tutarız. Fesih üzerine, Siteyi ve Oyunu kullanma hakkınız derhal sona erecektir."
+    },
+    "disclaimer": {
+      "title": "Sorumluluk Reddi",
+      "content": "Sitemiz ve Oyunumuz 'olduğu gibi' ve 'mevcut olduğu şekliyle' sunulmaktadır. Hizmetlerimizin kesintisiz, zamanında, güvenli veya hatasız olacağını garanti etmiyoruz. Site veya Oyun aracılığıyla sağlanan herhangi bir bilginin, içeriğin veya materyalin doğruluğu, güvenilirliği veya kalitesi konusunda hiçbir garanti vermiyoruz."
+    },
+    "limitationOfLiability": {
+      "title": "Sorumluluk Sınırlaması",
+      "content": "Yasaların izin verdiği azami ölçüde, hiçbir durumda Sitemizin veya Oyunumuzun kullanımınızdan kaynaklanan veya bununla ilgili herhangi bir dolaylı, arızi, özel, sonuç olarak ortaya çıkan veya cezai zararlardan sorumlu olmayacağız. Site veya Oyunla ilgili herhangi bir talep için toplam sorumluluğumuz, varsa, son on iki ay içinde bize ödediğiniz tutarı aşmayacaktır."
+    },
+    "changes": {
+      "title": "Şartlarda Değişiklikler",
+      "content": "Bu Şartları herhangi bir zamanda değiştirme hakkını saklı tutarız. Önemli değişiklikler hakkında Sitemizde bir duyuru yayınlayarak veya size bir e-posta göndererek bilgi vereceğiz. Bu tür değişikliklerden sonra Siteyi veya Oyunu kullanmaya devam etmeniz, yeni Şartları kabul ettiğiniz anlamına gelir."
+    },
+    "contact": {
+      "title": "Bize Ulaşın",
+      "content": "Bu Şartlar hakkında herhangi bir sorunuz varsa, lütfen mertaslan16@gmail.com adresinden bizimle iletişime geçin."
+    }
   }
 }
 

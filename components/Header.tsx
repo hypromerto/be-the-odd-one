@@ -3,9 +3,10 @@
 import { useState } from "react"
 import Link from "next/link"
 import {useLocale, useTranslations} from "next-intl"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu, GamepadIcon } from "lucide-react"
+import { Menu } from "lucide-react"
 import LanguageSwitcher from "./LanguageSwitcher"
 import { HelpDialog } from "./HelpDialog"
 import {getFullUrl} from "@/utils/url";
@@ -51,8 +52,8 @@ const Header = () => {
 
                 {/* Desktop Logo */}
                 <Link href="/" className="flex items-center space-x-2 text-indigo-600 hover:text-indigo-800 transition-colors">
-                    <GamepadIcon className="h-8 w-8" />
-                    <span className="text-xl font-bold">Be the Odd One</span>
+                    <Image src="/be-the-odd-one.png" alt="Be the Odd One" width={42} height={42}/>
+                    <span className="text-xl lg:text-3xl  font-bold ml-2">Be the Odd One</span>
                 </Link>
 
                 {/* Right side icons */}

@@ -45,15 +45,15 @@ export default function Lobby({ roomId, players, isHost, onStartGame, isStarting
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 flex flex-col bg-gradient-to-br from-indigo-50/30 via-purple-50/30 to-pink-50/30 backdrop-blur-3xl overflow-y-auto"
+            className="min-h-screen flex flex-col from-indigo-50/30 via-purple-50/30 to-pink-50/30"
         >
-            <div className="flex-1 p-4 pt-28 lg:p-8 lg:pt-24">
+            <div className="flex-1 p-4 pt-16 lg:p-8 lg:pt-24">
                 <motion.div
                     initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.5, type: "spring" }}
                 >
-                    <Card className="mx-auto max-w-[90rem] h-fit lg:h-[calc(100vh-12rem)] backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-white/20 bg-white/10 overflow-hidden">
+                    <Card className="mx-auto max-w-[90rem] h-fit lg:h-[calc(100vh-12rem)] rounded-3xl shadow-md bg-white">
                         <motion.div
                             className="flex flex-col h-full p-6 pb-2 lg:p-6"
                             initial={{ y: 20, opacity: 0 }}
@@ -77,7 +77,7 @@ export default function Lobby({ roomId, players, isHost, onStartGame, isStarting
                             {/* Mobile Layout */}
                             <div className="lg:hidden flex-1 min-h-0 flex flex-col">
                                 <Tabs defaultValue="players" className="flex-1 flex flex-col">
-                                    <TabsList className="grid w-full grid-cols-3 mb-4 bg-white/5 rounded-2xl backdrop-blur-xl border border-white/10">
+                                    <TabsList className="grid w-full grid-cols-3 mb-4 bg-white rounded-2xl border">
                                         <TabsTrigger
                                             value="players"
                                             className="flex items-center justify-center data-[state=active]:bg-indigo-600 data-[state=active]:text-white rounded-md transition-all py-2 text-xs sm:text-base"
@@ -197,7 +197,7 @@ export default function Lobby({ roomId, players, isHost, onStartGame, isStarting
                             {/* Desktop Layout */}
                             <div className="hidden lg:flex flex-grow min-h-0 gap-8">
                                 <motion.div
-                                    className="w-1/3 bg-stone-100 rounded-2xl p-6 backdrop-blur-xl border border-white/10 "
+                                    className="w-1/3 bg-white rounded-2xl p-6 border"
                                     initial={{x: -50, opacity: 0}}
                                     animate={{x: 0, opacity: 1}}
                                     transition={{delay: 0.5}}
@@ -215,7 +215,7 @@ export default function Lobby({ roomId, players, isHost, onStartGame, isStarting
                                 <Separator orientation="vertical" className="bg-white/10"/>
 
                                 <motion.div
-                                    className="w-1/3 bg-stone-100 rounded-2xl p-6 backdrop-blur-xl border border-white/10 overflow-y-auto"
+                                    className="w-1/3 bg-white rounded-2xl p-6 border overflow-y-auto"
                                     initial={{ y: 50, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: 0.6 }}
@@ -229,7 +229,7 @@ export default function Lobby({ roomId, players, isHost, onStartGame, isStarting
                                 <Separator orientation="vertical" className="bg-white/10" />
 
                                 <motion.div
-                                    className="w-1/3 bg-stone-100 rounded-2xl p-6 backdrop-blur-xl border border-white/10"
+                                    className="w-1/3 bg-white rounded-2xl p-6 border"
                                     initial={{ x: 50, opacity: 0 }}
                                     animate={{ x: 0, opacity: 1 }}
                                     transition={{ delay: 0.7 }}
@@ -250,7 +250,7 @@ export default function Lobby({ roomId, players, isHost, onStartGame, isStarting
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: -20 }}
-                                            className="p-4 bg-yellow-500/10 rounded-2xl border border-yellow-500/20 backdrop-blur-xl"
+                                            className="p-4 bg-yellow-100 rounded-2xl border border-yellow-200"
                                         >
                                             <p className="text-yellow-700 text-base font-medium">{t("needMorePlayers")}</p>
                                         </motion.div>

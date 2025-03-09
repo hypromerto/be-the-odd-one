@@ -31,6 +31,13 @@ export default function HomePage() {
         setIsCreating(true)
         setError(null)
         try {
+            // Skip reCAPTCHA in development
+            if (process.env.NODE_ENV === 'development') {
+                const { roomId } = await createRoom('development-token', playerName)
+                router.push(`/room/${roomId}`)
+                return
+            }
+
             window.grecaptcha.ready(() => {
                 window.grecaptcha
                     .execute(SITE_KEY, { action: "submit" })

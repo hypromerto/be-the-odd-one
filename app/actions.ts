@@ -9,6 +9,11 @@ const SECRET_KEY = process.env.RECAPTCHA_SECRETKEY
 const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${SECRET_KEY}&response=`
 
 const verifyRecaptchaToken = async (token: string) => {
+    // Skip verification in development
+    if (process.env.NODE_ENV === 'development') {
+        return null;
+    }
+    
     try {
         const tokenUrl = verifyUrl + token
         const recaptchaRes = await fetch(tokenUrl, { method: "POST" })

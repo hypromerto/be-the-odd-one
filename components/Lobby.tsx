@@ -47,20 +47,20 @@ export default function Lobby({ roomId, players, isHost, onStartGame, isStarting
             animate={{ opacity: 1 }}
             className="fixed inset-0 flex flex-col bg-gradient-to-br from-indigo-50/30 via-purple-50/30 to-pink-50/30 backdrop-blur-3xl"
         >
-            <div className="flex-1 overflow-hidden p-4 pt-20 lg:p-8 lg:pt-24">
+            <div className="flex-1 overflow-hidden p-4 pt-28 lg:p-8 lg:pt-24">
                 <motion.div
                     initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.5, type: "spring" }}
                 >
-                    <Card className="mx-auto max-w-[90rem] h-[calc(100vh-8rem)] lg:h-[calc(100vh-12rem)] backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-white/20 bg-white/10 overflow-hidden">
+                    <Card className="mx-auto max-w-[90rem] h-fit lg:h-[calc(100vh-12rem)] backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-white/20 bg-white/10 overflow-hidden">
                         <motion.div
-                            className="flex flex-col h-full p-6"
+                            className="flex flex-col h-full p-6 pb-2 lg:p-6"
                             initial={{ y: 20, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ delay: 0.2 }}
                         >
-                            <div className="flex-shrink-0 mb-6">
+                            <div className="flex-shrink-0 mb-4 sm:mb-2">
                                 <motion.div
                                     className="text-center"
                                     initial={{ scale: 0.9, opacity: 0 }}
@@ -110,7 +110,7 @@ export default function Lobby({ roomId, players, isHost, onStartGame, isStarting
                                                         exit={{ opacity: 0, x: 20 }}
                                                         className="flex-1 overflow-hidden"
                                                     >
-                                                        <ScrollArea className="h-[calc(100vh-28rem)]">
+                                                        <ScrollArea className="h-[calc(100vh-35rem)] sm:h-[calc(100vh-28rem)]">
                                                             <PlayerList players={players} />
                                                         </ScrollArea>
                                                     </motion.div>
@@ -122,7 +122,7 @@ export default function Lobby({ roomId, players, isHost, onStartGame, isStarting
                                                         exit={{ opacity: 0, x: 20 }}
                                                         className="flex-1 overflow-hidden"
                                                     >
-                                                        <ScrollArea className="h-[calc(100vh-28rem)]">
+                                                        <ScrollArea className="h-[calc(100vh-35rem)] sm:h-[calc(100vh-28rem)]">
                                                             <GameSettings roomId={roomId} isHost={isHost} />
                                                         </ScrollArea>
                                                     </motion.div>
@@ -134,7 +134,7 @@ export default function Lobby({ roomId, players, isHost, onStartGame, isStarting
                                                         exit={{ opacity: 0, x: 20 }}
                                                         className="flex-1 overflow-hidden"
                                                     >
-                                                        <ScrollArea className="h-[calc(100vh-28rem)]">
+                                                        <ScrollArea className="h-[calc(100vh-35rem)] sm:h-[calc(100vh-28rem)]">
                                                             <HowToPlay />
                                                         </ScrollArea>
                                                     </motion.div>
@@ -142,7 +142,7 @@ export default function Lobby({ roomId, players, isHost, onStartGame, isStarting
                                             </AnimatePresence>
                                         </div>
 
-                                        <div className="flex-shrink-0 mt-4 space-y-4">
+                                        <div className="flex-shrink-0 mt-2 sm:mt-4 space-y-2 sm:space-y-4">
                                             <AnimatePresence>
                                                 {showNeedMorePlayers && (
                                                     <motion.div

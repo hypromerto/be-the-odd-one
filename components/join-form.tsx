@@ -38,6 +38,13 @@ export default function JoinForm({ roomId }: JoinFormProps) {
         setIsJoining(true)
         setError(null)
         try {
+            // Skip reCAPTCHA in development
+            if (process.env.NODE_ENV === 'development') {
+                await joinRoom(joiningName, 'development-token')
+                router.refresh()
+                return
+            }
+
             window.grecaptcha.ready(() => {
                 window.grecaptcha
                     .execute(SITE_KEY, { action: "submit" })

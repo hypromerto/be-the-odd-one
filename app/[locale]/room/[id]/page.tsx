@@ -3,11 +3,26 @@ import JoinForm from "@/components/join-form"
 import { createClient } from "@/utils/supabase/server"
 import { getCurrentUser, signInAnonymously } from "@/lib/auth"
 import Script from "next/script"
-import {GameChannelProvider} from "@/contexts/GameChannelContext";
+import { GameChannelProvider } from "@/contexts/GameChannelContext"
+import { Metadata } from "next"
 
 const SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITEKEY
 
-export default async function RoomPage({ params }: { params: { id: string; locale: string } }) {
+interface Props {
+    params: { id: string; locale: string }
+}
+
+// Simple metadata that doesn't require database query
+export const metadata: Metadata = {
+    robots: {
+        index: false,  // Most important part - prevent indexing of room pages
+        follow: true,
+    },
+    title: 'Join Game Room | Be the Odd One',
+    description: 'Join a room in Be the Odd One - a social party game where players try to give unique answers to themes!'
+}
+
+export default async function RoomPage({ params }: Props) {
     const supabase = await createClient()
 
     let user = await getCurrentUser()

@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     keywords: ['party game', 'social party game', 'online game', 'multiplayer game', 'fun with friends', 'unique answers', 'themes', 'odd one out'],
     openGraph: {
         title: 'Be the Odd One - Fun Party Game',
-        description: 'Join the fun in Be the Odd One - a social deduction party game where players try to be the odd one out!',
+        description: 'Join the fun in Be the Odd One - a social party game where players try to be the odd one out!',
         url: '/',
         siteName: 'Be the Odd One',
         images: [

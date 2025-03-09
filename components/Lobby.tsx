@@ -45,9 +45,9 @@ export default function Lobby({ roomId, players, isHost, onStartGame, isStarting
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="fixed inset-0 flex flex-col bg-gradient-to-br from-indigo-50/30 via-purple-50/30 to-pink-50/30 backdrop-blur-3xl"
+            className="fixed inset-0 flex flex-col bg-gradient-to-br from-indigo-50/30 via-purple-50/30 to-pink-50/30 backdrop-blur-3xl overflow-y-auto"
         >
-            <div className="flex-1 overflow-hidden p-4 pt-28 lg:p-8 lg:pt-24">
+            <div className="flex-1 p-4 pt-28 lg:p-8 lg:pt-24">
                 <motion.div
                     initial={{ scale: 0.95, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
